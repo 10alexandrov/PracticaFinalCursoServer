@@ -34,6 +34,7 @@ Route::resource('/admin/product',ProductoController::class) -> names("admin.prod
 
 Route::post('/admin/product/find', [ProductoController::class, 'find']) -> name("admin.productos.find");
 
-Route::resource('/pedido/facturas',FacturaController::class) -> names("pedido.facturas");
-Route::post('/pedido/facturas/find', [FacturaController::class, 'find']) -> name("pedido.facturas.find");
+Route::resource('/pedido',FacturaController::class);
+Route::post('/pedido/store', [FacturaController::class, 'store']);
+Route::post('/pedido/find', [FacturaController::class, 'find']) -> name("pedido.find");
 

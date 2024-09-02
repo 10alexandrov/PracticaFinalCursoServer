@@ -14,7 +14,7 @@ class CrearTablaProductos extends Migration
     public function up()
     {
         Schema::create('productos', function (Blueprint $table) {
-            $table->id('id_product');                          // Уникальный идентификатор продукта
+            $table->id('product_id');                          // Уникальный идентификатор продукта
             $table->string('p_nombre', 255);                   // Название продукта
             $table->unsignedBigInteger('p_categoria');             // Categoria
             $table->string('p_descripcion', 255)->nullable();  // Описание продукта (может быть пустым)
@@ -30,7 +30,6 @@ class CrearTablaProductos extends Migration
             $table->decimal('p_precio_compra', 10, 2);         // Цена закупки
             $table->decimal('p_precio_venta', 10, 2);          // Цена продажи
             $table->string('p_codigo', 255)            ;         // Codigo de barras
-            $table->date('fecha_ingreso')->nullable();         // Дата ввода продукта в базу данных (может быть пустой)
             $table->timestamps();                              // Добавляет столбцы created_at и updated_at
 
                         // Определение внешних ключей

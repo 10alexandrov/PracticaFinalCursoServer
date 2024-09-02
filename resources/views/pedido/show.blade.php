@@ -3,8 +3,10 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- CSRF Token for Laravel -->
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>Laravel</title>
+        <title>Detalles de Factura</title>
 
     </head>
     <body class="AW-body">
@@ -15,24 +17,27 @@
             </div>
         </div>
         <div class="main-content">
-            <h1> Usuarios </h1>
+            <h1> Detalles de Factura {{ $id }}</h1>
+
             <div class="table_container">
                 <table>
                     <tr>
-                        <th> Usuario </th>
-                        <th> Login </th>
-                        <th> Role </th>
+                        <th> Producto </th>
+                        <th> Cantidad </th>
+                        <th> Suma </th>
+                        <th> Fecha </th>
                         <th> Editar </th>
                         <th> Borrar </th>
                     </tr>
-                    @foreach ($usuarios as $usuario)
+                    @foreach ($mercancias as $mercancia)
                         <tr>
-                            <td> {{$usuario->u_nombre}} </td>
-                            <td> {{$usuario->u_login}} </td>
-                            <td> {{$usuario->u_role}} </td>
-                            <td> <a href='{{ route('admin.usuarios.edit', $usuario->usuario_id)}}'>Editar </a></td>
+                            <td> {{$mercancia->m_nombre}} </td>
+                            <td> {{$mercancia->m_cantidad_pedida}} </td>
+                            <td> {{$mercancia->m_suma_pedida}} </td>
+                            <td> {{$mercancia->m_fecha_pedida}} </a></td>
+                            <td> <a class="anadir" id="{{$mercancia->id}}" href='#'>Anadir </a></td>
                             <td>
-                                <form action="{{ route('admin.usuarios.destroy', $usuario->usuario_id)}}" method="POST">
+                                <form action="#" method="POST">
                                     @method('DELETE')
                                     @csrf
                                     <button>Borrar </button>
@@ -43,9 +48,13 @@
                     @endforeach
                 </table>
             </div>
-            <a  href="{{ route('admin.usuarios.create')}}">
-                <button class='m-100'>Crear nuevo usuario </button>
-           </a>
+
+           <a  href="{{ route('pedido.index')}}">
+            <button class='m-100' id="borrarFactura">Volver </button>
+          </a>
+          <a  href="{{ route('pedido.edit', $id)}}">
+            <button class='m-100' id="editarFactura">Editar </button>
+          </a>
         </div>
     </body>
 </html>
@@ -94,5 +103,17 @@
 
     .m-100 {
         margin-top: 100px;
+    }
+
+    .d-flex {
+        display: flex;
+    }
+
+    .linea {
+        width: 50%;
+        height: 2px;
+        background-color: #666;
+        justify-content: center;
+        margin: 20px 25%;
     }
 </style>

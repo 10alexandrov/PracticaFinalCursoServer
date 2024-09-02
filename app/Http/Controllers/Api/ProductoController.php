@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Models\Usuario;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Producto;
+use App\Models\Categoria;
 
-class UsuarioController extends Controller
+class ProductoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +16,14 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        $usuarios=Usuario::get();
-        return view ('admin.user.index', compact('usuarios'));
+        $productos = Producto::all();
+
+        $productos -> map(function($producto) {
+            $producto -> p_nombre_categoria = $producto->categoria->c_nombre ?? 'unknown';
+            return $producto;
+        });
+
+        return $productos;
     }
 
     /**
@@ -25,7 +33,7 @@ class UsuarioController extends Controller
      */
     public function create()
     {
-        return view ('admin.user.create');
+        //
     }
 
     /**
@@ -35,13 +43,8 @@ class UsuarioController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-
     {
-        $data = $request->except('_token');
-        Usuario::create($data);
-
-        $usuarios=Usuario::get();
-        return view ('admin.user.index', compact('usuarios'));
+        //
     }
 
     /**
@@ -63,8 +66,7 @@ class UsuarioController extends Controller
      */
     public function edit($id)
     {
-        $usuario=Usuario::findOrFail($id);
-        return view ('admin.user.edit', compact('usuario'));
+        //
     }
 
     /**
@@ -76,11 +78,7 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->except('_token');
-        Usuario::findOrFail($id) ->update($data);
-
-        $usuarios=Usuario::get();
-        return view ('admin.user.index', compact('usuarios'));
+        //
     }
 
     /**
@@ -89,10 +87,8 @@ class UsuarioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($usuario_id)
+    public function destroy($id)
     {
-        Usuario::findOrFail($usuario_id)->delete();
-        $usuarios=Usuario::get();
-        return view ('admin.user.index', compact('usuarios'));
+        //
     }
 }

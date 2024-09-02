@@ -3,6 +3,8 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- CSRF Token for Laravel -->
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>Product</title>
 
@@ -57,7 +59,7 @@
                             <td> {{$producto->p_categoria}} </td>
                             <td> {{$producto->p_cantidad_almacen}} </td>
                             <td> <a href='#'>Mostrar </a></td>
-                            <td> <a class="anadir" id="{{$producto->id_product}}" href='#'>Anadir </a></td>
+                            <td> <a class="anadir" id="{{$producto->product_id}}" href='#'>Anadir </a></td>
                             <td>
                                 <form action="#" method="POST">
                                     @method('DELETE')
@@ -81,7 +83,7 @@
                             <th> Categoria </th>
                             <th> Cantidad </th>
                             <th> Mas </th>
-                            <th> Minus </th>
+                            <th> Menus </th>
                             <th> Borrar </th>
                         </tr>
                     </thead>
@@ -92,9 +94,13 @@
             </div>
 
 
-            <a  href="{{ route('pedido.facturas.store')}}">
-                <button class='m-100'>Crear nuevo pedido </button>
+            <a  href="#">
+                <button class='m-100' id="crearFactura">Crear nuevo pedido </button>
            </a>
+
+           <a  href="#">
+            <button class='m-100' id="borrarFactura">Borrar pedido </button>
+          </a>
         </div>
     </body>
 </html>
@@ -165,18 +171,26 @@
 
     document.addEventListener('DOMContentLoaded', (event) => {
         // Объект для хранения количества нажатий для каждой кнопки
-        const clickCounts = [];
+        let clickCounts;
+        const clickCountsLocalStorage = localStorage.getItem('facturaNueva');
+
+        if (clickCountsLocalStorage) {
+            clickCounts = JSON.parse(clickCountsLocalStorage);
+        } else {
+            clickCounts = [];
+        }
+
+        updateTable(clickCounts);  // devoler datos a la tabla Factura
 
                 // Get name product by ID
         function getNameProduct (productos, buttonId) {
-            console.log(buttonId);
-            console.log(productos);
-            const producto = productos.find(p=>p.id_product == buttonId);
+
+            const producto = productos.find(p=>p.product_id == buttonId);
             return producto ? producto.p_nombre : "sin nombre";
         }
         // get category product by ID
         function getNameCategory (productos, buttonId) {
-            const producto = productos.find(p=>p.id_product == buttonId);
+            const producto = productos.find(p=>p.product_id == buttonId);
             return producto ? producto.p_categoria : "sin categoria";
         }
 
@@ -203,7 +217,7 @@
                 clickCounts.push(newObject);
 
                 // Обновление таблицы
-                updateTable(newObject, buttonId);
+                updateTable(clickCounts);
 
             }
         }
@@ -212,80 +226,180 @@
         // Функция для обработки нажатий на кнопки Mas
         function handleButtonClickMas(event) {
             const buttonId = event.target.id;
-            // probamos si exist este ID producto
+            console.log ('mas');
+            console.log(buttonId);
 
-            let exists = clickCounts.some(item=> item.m_id_productos === buttonId);
-
-            // Si no exists recordamos
-            if (!exists) {
-
-                let productName = getNameProduct(productos, buttonId);
-                let productNameCategory = getNameCategory(productos, buttonId);
-
-                let newObject = {
-                m_id_productos : buttonId,
-                p_nombre: productName,
-                p_categoria: productNameCategory,
-                m_cantidad_pedida: 1
-                };
-
-                clickCounts.push(newObject);
+            if (Array.isArray(clickCounts)) {
+                clickCounts.forEach(correctObject => {
+                    if (correctObject.m_id_productos == buttonId) {
+                        correctObject.m_cantidad_pedida = (correctObject.m_cantidad_pedida || 0) + 1;
+                    }
+                });
 
                 // Обновление таблицы
-                updateTable(newObject, buttonId);
+                updateTable(clickCounts);
 
             }
+        }
+
+                // Функция для обработки нажатий на кнопки Menos
+            function handleButtonClickMenos(event) {
+            const buttonId = event.target.id;
+
+            if (Array.isArray(clickCounts)) {
+                clickCounts.forEach(correctObject => {
+                    if (correctObject.m_id_productos == buttonId) {
+                        correctObject.m_cantidad_pedida = (correctObject.m_cantidad_pedida || 0) - 1;
+                    }
+                });
+
+                // Обновление таблицы
+                updateTable(clickCounts);
+
+            }
+        }
+
+        // Функция для обработки нажатий на кнопки Borrar
+        function handleButtonClickBorrar(event) {
+            console.log('flagB');
+            const buttonId = event.target.id;
+            const index = clickCounts.findIndex(n=>n.m_id_productos == buttonId);
+            if (index !== -1) {
+                clickCounts.splice(index,1);
+            }
+
+        // Обновление таблицы
+        updateTable(clickCounts);
+
+        }
+
+        // function para update listeners de actiones
+
+        function updateButtons () {
+
+            // Получение всех кнопок с классом 'mas' ***
+            const buttonsMas = document.querySelectorAll('.mas');
+
+            // Получение всех кнопок с классом 'menosr' ***
+            const buttonsMenos = document.querySelectorAll('.menos');
+
+            // Получение всех кнопок с классом 'borrar' ***
+            const buttonsBorrar = document.querySelectorAll('.borrar');
+
+            buttonsMas.forEach(button1 => {
+                button1.removeEventListener('click', handleButtonClickMas);
+            });
+
+            buttonsMenos.forEach(button2 => {
+                button2.removeEventListener('click', handleButtonClickMenos);
+            });
+
+            buttonsBorrar.forEach(button3 => {
+                button3.removeEventListener('click', handleButtonClickBorrar);
+            });
+
+            buttonsMas.forEach(button1 => {
+                button1.addEventListener('click', handleButtonClickMas);
+            });
+
+            buttonsMenos.forEach(button2 => {
+                button2.addEventListener('click', handleButtonClickMenos);
+            });
+
+            buttonsBorrar.forEach(button3 => {
+                button3.addEventListener('click', handleButtonClickBorrar);
+            });
+
+
+
         }
 
 
 
         // Функция для обновления таблицы
-        function updateTable(newObject, buttonId) {
+        function updateTable(newObject) {
+
+            localStorage.setItem('facturaNueva', JSON.stringify(clickCounts))
             const tableBody = document.getElementById('factura-nueva');
+            tableBody.innerHTML ='';
 
 
                 // Создание новой строки в таблице
-                const newRow = document.createElement('tr');
-                newRow.dataset.buttonId = buttonId;
-                newRow.innerHTML = `
-                    <td>${newObject.p_nombre}</td>
-                    <td>${newObject.p_categoria}</td>
-                    <td>${newObject.m_cantidad_pedida}</td>
-                    <td class="mas" id="${newObject.m_id_productos}">Mas</td>
-                    <td class="menos" id="${newObject.m_id_productos}">Menos</td>
-                    <td class="borrar" id="${newObject.m_id_productos}">Borrar</td>
-                `;
-                tableBody.appendChild(newRow);
+                if (Array.isArray(clickCounts)) {
+                    clickCounts.forEach(newObject => {
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                            <td>${newObject.p_nombre}</td>
+                            <td>${newObject.p_categoria}</td>
+                            <td>${newObject.m_cantidad_pedida}</td>
+                            <td class="mas"> <button id="${newObject.m_id_productos}">Mas</button></td>
+                            <td class="menos"> <button id="${newObject.m_id_productos}">Menos</button></td>
+                            <td class="borrar"> <button id="${newObject.m_id_productos}">Borrar</button></td>
+                        `;
+                        tableBody.appendChild(newRow);
+                    });
+                }
+
+            updateButtons();
 
         }
 
         // Получение всех кнопок с классом 'anadir' ***
         const buttons = document.querySelectorAll('.anadir');
 
-        // Получение всех кнопок с классом 'mas' ***
-        const buttonsMas = document.querySelectorAll('.mas');
+        // Получение button Borrar totalmente
+        const buttonBorrar = document.getElementById('borrarFactura');
 
-        // Получение всех кнопок с классом 'menosr' ***
-        const buttonsMenos = document.querySelectorAll('.menos');
+        // Получение button Crear Factura
+        const buttonCrear = document.getElementById('crearFactura');
 
-        // Получение всех кнопок с классом 'borrar' ***
-        const buttonsBorrar = document.querySelectorAll('.borrar');
+        console.log(clickCounts);
 
-        // Добавление обработчика событий на каждую кнопку
+        // Добавление обработчика событий на каждую Anadir
         buttons.forEach(button => {
             button.addEventListener('click', handleButtonClick);
         });
 
-        buttonsMas.forEach(button => {
-            button.addEventListener('click', handleButtonClickMas);
+        // Добавление обработчика событий на Borrar Factura
+        buttonBorrar.addEventListener('click', () => {
+            console.log('flag');
+            clickCounts = [];
+            localStorage.removeItem('clickCounts');
+            updateTable(clickCounts);
         });
 
-        buttonsMenos.forEach(button => {
-            button.addEventListener('click', handleButtonClickMenos);
-        });
+        // Добавление обработчика событий на Borrar Factura
+        buttonCrear.addEventListener('click', () => {
 
-        buttonsBorrar.forEach(button => {
-            button.addEventListener('click', handleButtonClickBorrar);
+            console.log(JSON.stringify({ products: clickCounts }));
+
+            fetch('/pedido/store', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ products: clickCounts })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Выводим код статуса и текст ответа для отладки
+                    return response.text().then(text => {
+                        throw new Error(`Network response was not ok. Status: ${response.status}. Response: ${text}`);
+                    });
+                }
+
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data sent successfully:', data);
+                clickCounts = [];
+                localStorage.removeItem('clickCounts');
+                updateTable(clickCounts);
+            })
+            .catch(error => {
+                console.error('Error sending data:', error);
+            });
         });
     });
 </script>

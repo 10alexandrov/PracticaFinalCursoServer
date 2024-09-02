@@ -72,12 +72,12 @@
                             <img src="{{ asset('storage/'.$producto->p_foto)}}">
                         </div>
                         <div class="m-10">
-                            <a  href="{{ route('admin.productos.edit', $producto->id_product)}}">
+                            <a  href="{{ route('admin.productos.edit', $producto->product_id)}}">
                                 <button class='m-100'>Editar </button>
                             </a>
                         </div>
                         <div class="m-10">
-                            <a  href="{{ route('admin.productos.destroy', $producto->id_product)}}">
+                            <a  href="{{ route('admin.productos.destroy', $producto->product_id)}}">
                                 <button class='m-100'>Borrar </button>
                             </a>
                         </div>

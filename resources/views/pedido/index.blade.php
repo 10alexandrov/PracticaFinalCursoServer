@@ -17,7 +17,7 @@
         <div class="main-content">
             <h1> Mis facturas </h1>
             <div class='find_container'>
-                <form action="{{ route('pedido.facturas.find')}}" method="POST">
+                <form action="{{ route('pedido.find')}}" method="POST">
                     @csrf
                     <div class="d-flex" style="margin-left: 100px;">
                         <div class="form-group m-20">
@@ -40,13 +40,13 @@
                     </tr>
                     @foreach ($facturas as $factura)
                         <tr>
-                            <td> {{$factura->f_id}} </td>
-                            <td> {{$factura->f_fecha}} </td>
+                            <td> {{$factura->factura_id}} </td>
+                            <td> {{$factura->created_at}} </td>
                             <td> {{$factura->f_suma}} </td>
-                            <td> <a href='{{ route('pedido.facturas.show', $factura->f_id)}}'>Mostrar </a></td>
-                            <td> <a href='{{ route('pedido.facturas.edit', $factura->f_id)}}'>Editar </a></td>
+                            <td> <a href='{{ route('pedido.show', $factura->factura_id)}}'>Mostrar </a></td>
+                            <td> <a href='{{ route('pedido.edit', $factura->factura_id)}}'>Editar </a></td>
                             <td>
-                                <form action="{{ route('pedido.facturas.destroy', $factura->f_id)}}" method="POST">
+                                <form action="{{ route('pedido.destroy', $factura->factura_id)}}" method="POST">
                                     @method('DELETE')
                                     @csrf
                                     <button>Borrar </button>
@@ -57,7 +57,7 @@
                     @endforeach
                 </table>
             </div>
-            <a  href="{{ route('pedido.facturas.create')}}">
+            <a  href="{{ route('pedido.create')}}">
                 <button class='m-100'>Crear nueva factura </button>
            </a>
         </div>

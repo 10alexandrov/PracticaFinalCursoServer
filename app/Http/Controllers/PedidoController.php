@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Usuario;
 use Illuminate\Http\Request;
 
-class UsuarioController extends Controller
+class PedidoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +13,7 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        $usuarios=Usuario::get();
-        return view ('admin.user.index', compact('usuarios'));
+        //
     }
 
     /**
@@ -25,7 +23,7 @@ class UsuarioController extends Controller
      */
     public function create()
     {
-        return view ('admin.user.create');
+        //
     }
 
     /**
@@ -34,14 +32,9 @@ class UsuarioController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-
+    public function store()
     {
-        $data = $request->except('_token');
-        Usuario::create($data);
-
-        $usuarios=Usuario::get();
-        return view ('admin.user.index', compact('usuarios'));
+        return "Hola, store pedido!";
     }
 
     /**
@@ -50,9 +43,9 @@ class UsuarioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show()
     {
-        //
+        return "Hola, show pedido!";
     }
 
     /**
@@ -61,10 +54,9 @@ class UsuarioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit()
     {
-        $usuario=Usuario::findOrFail($id);
-        return view ('admin.user.edit', compact('usuario'));
+        return "Hola edit pedido";
     }
 
     /**
@@ -76,11 +68,7 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->except('_token');
-        Usuario::findOrFail($id) ->update($data);
-
-        $usuarios=Usuario::get();
-        return view ('admin.user.index', compact('usuarios'));
+        //
     }
 
     /**
@@ -89,10 +77,8 @@ class UsuarioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($usuario_id)
+    public function destroy($id)
     {
-        Usuario::findOrFail($usuario_id)->delete();
-        $usuarios=Usuario::get();
-        return view ('admin.user.index', compact('usuarios'));
+        //
     }
 }

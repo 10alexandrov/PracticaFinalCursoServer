@@ -56,10 +56,10 @@
                             <td> {{$producto->p_nombre}} </td>
                             <td> {{$producto->p_categoria}} </td>
                             <td> {{$producto->p_cantidad_almacen}} </td>
-                            <td> <a href='{{ route('admin.productos.show', $producto->id_product)}}'>Mostrar </a></td>
-                            <td> <a href='{{ route('admin.productos.edit', $producto->id_product)}}'>Editar </a></td>
+                            <td> <a href='{{ route('admin.productos.show', $producto->product_id)}}'>Mostrar </a></td>
+                            <td> <a href='{{ route('admin.productos.edit', $producto->product_id)}}'>Editar </a></td>
                             <td>
-                                <form action="{{ route('admin.productos.destroy', $producto->id_product)}}" method="POST">
+                                <form action="{{ route('admin.productos.destroy', $producto->product_id)}}" method="POST">
                                     @method('DELETE')
                                     @csrf
                                     <button>Borrar </button>

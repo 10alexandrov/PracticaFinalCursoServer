@@ -52,9 +52,9 @@ class ProductoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($producto_id)
     {
-        $producto=Producto::findOrFail($id);
+        $producto=Producto::findOrFail($producto_id);
         return view ('admin.product.show', compact('producto'));
     }
 
@@ -102,9 +102,9 @@ class ProductoController extends Controller
      */
 
 
-    public function destroy($id_producto)
+    public function destroy($producto_id)
     {
-        Producto::findOrFail($id_producto)->delete();
+        Producto::findOrFail($producto_id)->delete();
         $productos=Producto::get();
         return view ('admin.product.index', compact('productos'));
     }
@@ -127,7 +127,7 @@ class ProductoController extends Controller
 
         }
 
-        return view ('pedido.create', compact('productos'));
+
 
         if ($request ->rute ==='pedido') {
             return view ('pedido.create', compact('productos'));
@@ -135,5 +135,6 @@ class ProductoController extends Controller
         } else {
             return view ('pedido.create', compact('productos'));
         }
+
     }
 }

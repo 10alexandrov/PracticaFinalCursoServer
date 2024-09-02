@@ -27,13 +27,13 @@
             </a>
         </div>
         <div class="wrapper">
-            <a class=" cta cta-mini" href="#">
-                <span>Llegada</span>
+            <a class=" cta cta-mini" href="{{ route('pedido.index')}}">
+                <span>Facturas</span>
             </a>
         </div>
         <div class="wrapper">
             <a class=" cta cta-mini" href="#">
-                <span>Pedidos</span>
+                <span>Algo mas</span>
             </a>
         </div>
     </div>
@@ -96,12 +96,12 @@
 
         <div id = "desktop-menu-pedido-submenu" style='height:0px;'>
             <div class="wrapper">
-                <a class=" cta cta-mini" href='{{ route('pedido.facturas.index')}}'>
+                <a class=" cta cta-mini" href='{{ route('pedido.index')}}'>
                     <span>Facturas</span>
                 </a>
             </div>
             <div class="wrapper">
-                <a class=" cta cta-mini" href="{{ route('pedido.facturas.create')}}">
+                <a class=" cta cta-mini" href="{{ route('pedido.create')}}">
                     <span>Nuevo pedido</span>
                 </a>
             </div>

@@ -23,7 +23,7 @@
                 <div class="container mt-5">
                     <div class="table_container">
                         <div>
-                            <form action="{{ route('admin.productos.update', $producto->id_product) }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('admin.productos.update', $producto->product_id) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
                                 <div class="form-group m-20">

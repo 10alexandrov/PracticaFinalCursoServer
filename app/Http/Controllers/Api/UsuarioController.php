@@ -36,7 +36,11 @@ class UsuarioController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->except('_token');
+        Usuario::create($data);
+
+        $usuarios=Usuario::get();
+        return $usuarios = Usuario::all();
     }
 
     /**

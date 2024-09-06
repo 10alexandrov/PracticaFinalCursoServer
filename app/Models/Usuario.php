@@ -13,7 +13,7 @@ class Usuario extends Model
     // Especifica la clave primaria de la tabla
     protected $primaryKey = 'usuario_id';
 
-    protected $fillable =['u_nombre', 'u_login', 'u_password', 'u_role'];
+    protected $fillable =['u_nombre', 'u_login', 'u_password', 'u_role', 'u_active'];
 
     public function factura () {
         return $this->hasMeny(Factura::class);

@@ -19,6 +19,7 @@ class CrearTablaUsuarios extends Migration
             $table->string('u_login',100)->unique();
             $table->string('u_password', 255);
             $table->enum('u_role',['admin','manager','cliente','vendedor','receptor','recogedor']);  // Role usuario
+            $table->boolean('u_active');    // Usuario ative
             $table->timestamps();
         });
     }

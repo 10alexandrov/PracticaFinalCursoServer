@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Categoria;
+use App\Models\Producto;
+use App\Models\Factura;
 
-class CategoriaController extends Controller
+class ApiFacturaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +16,17 @@ class CategoriaController extends Controller
      */
     public function index()
     {
-        return Categoria::all();
+        return $facturas = Factura::all();
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
     }
 
     /**
@@ -36,6 +47,17 @@ class CategoriaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
     {
         //
     }

@@ -2,10 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\ProductoController;
-use App\Http\Controllers\Api\UsuarioController;
-use App\Http\Controllers\Api\FacturaController;
-use App\Http\Controllers\Api\CategoriaController;
+use App\Http\Controllers\Api\ApiProductoController;
+use App\Http\Controllers\Api\ApiUsuarioController;
+use App\Http\Controllers\Api\ApiFacturaController;
+use App\Http\Controllers\Api\ApiCategoriaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +22,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resource('/productos', ProductoController::class)-> names("productos");
-Route::resource('/categorias', CategoriaController::class)-> names("categorias");
-Route::resource('/usuarios', UsuarioController::class)-> names("usuarios");
-Route::resource('/facturas', FacturaController::class)-> names("facturas");
+Route::middleware(['cors'])->group(function () { Route::post('/usuarios', [ApiUsuarioController::class, 'store']); });
+
+Route::resource('/productos', ApiProductoController::class)-> names("productos");
+Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
+Route::resource('/usuarios', ApiUsuarioController::class)-> names("usuarios");
+Route::resource('/facturas', ApiFacturaController::class)-> names("facturas");

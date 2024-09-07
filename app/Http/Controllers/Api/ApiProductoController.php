@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Usuario;
+use App\Models\Producto;
+use App\Models\Categoria;
 
-class UsuarioController extends Controller
+class ApiProductoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +16,14 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        return $usuarios = Usuario::all();
+        $productos = Producto::all();
+
+        $productos -> map(function($producto) {
+            $producto -> p_nombre_categoria = $producto->categoria->c_nombre ?? 'unknown';
+            return $producto;
+        });
+
+        return $productos;
     }
 
     /**
@@ -36,14 +44,7 @@ class UsuarioController extends Controller
      */
     public function store(Request $request)
     {
-
-        $data = $request->except('_token');
-        Usuario::create($data);
-
-        return "Datos cargados correctamente";
-
-        // $usuarios=Usuario::get();
-        // return $usuarios = Usuario::all();
+        //
     }
 
     /**

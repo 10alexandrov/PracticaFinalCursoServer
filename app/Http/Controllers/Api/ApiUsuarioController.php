@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
+use Illuminate\Support\Facades\Response;
 
 class ApiUsuarioController extends Controller
 {
@@ -36,14 +37,27 @@ class ApiUsuarioController extends Controller
      */
     public function store(Request $request)
     {
+        $usuario = new Usuario;
+        $usuario->u_nombre = $request->u_nombre;
+        $usuario->u_password = $request->u_password;
+        $usuario->u_login = $request->u_login;
+        $usuario->u_role = $request->u_role;
+        $usuario->u_active = $request->u_active;
 
+        $usuario->save();
+
+        return Response::json(array(
+            'error' => false,
+            'userId' => $usuario->usuario_id),
+            200
+        );
      /*   $data = $request->except('_token');
         Usuario::create($data);
 
         return "Datos cargados correctamente";
-*/
+
          $usuarios=Usuario::get();
-         return $usuarios = Usuario::all();
+         return $usuarios = Usuario::all();*/
     }
 
     /**

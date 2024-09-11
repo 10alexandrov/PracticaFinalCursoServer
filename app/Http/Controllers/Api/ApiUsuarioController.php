@@ -44,11 +44,15 @@ class ApiUsuarioController extends Controller
         $usuario->u_role = $request->u_role;
         $usuario->u_active = $request->u_active;
 
-        $usuario->save();
+        try {
+            $usuario->save();
+        } catch (\Exception $e) {
+             return response()->json([ 'error' => true, 'message' => $e->getMessage() ], 500);
+        }
 
         return Response::json(array(
             'error' => false,
-            'userId' => $usuario->usuario_id),
+            'userId' => $request->u_nombre),
             200
         );
      /*   $data = $request->except('_token');
@@ -100,8 +104,8 @@ class ApiUsuarioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($usuario_id)
     {
-        //
+        Usuario::findOrFail($usuario_id)->delete();
     }
 }

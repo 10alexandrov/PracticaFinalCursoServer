@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Hash;
 
 class ApiUsuarioController extends Controller
 {
@@ -37,10 +38,15 @@ class ApiUsuarioController extends Controller
      */
     public function store(Request $request)
     {
-        $usuario = new Usuario;
+
+        $validated = $request->validate([
+            'u_login' => 'required|unique:usuarios',
+        ]);
+
+        $usuario = new Usuario();
+        $usuario->u_password = Hash::make($request->u_password);
         $usuario->u_nombre = $request->u_nombre;
-        $usuario->u_password = $request->u_password;
-        $usuario->u_login = $request->u_login;
+        $usuario->u_login = $validated['u_login'];
         $usuario->u_role = $request->u_role;
         $usuario->u_active = $request->u_active;
 

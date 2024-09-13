@@ -17,7 +17,7 @@ class CrearTablaUsuarios extends Migration
             $table->id('usuario_id');                          // Уникальный идентификатор п
             $table->string('u_nombre', 255);                   // Название продукта
             $table->string('u_login',100)->unique();
-            $table->string('u_password', 255);
+            $table->string('u_password', 60);
             $table->enum('u_role',['admin','manager','cliente','vendedor','receptor','recogedor']);  // Role usuario
             $table->boolean('u_active');    // Usuario ative
             $table->timestamps();

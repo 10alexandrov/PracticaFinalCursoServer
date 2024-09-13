@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ApiProductoController;
 use App\Http\Controllers\Api\ApiUsuarioController;
 use App\Http\Controllers\Api\ApiFacturaController;
 use App\Http\Controllers\Api\ApiCategoriaController;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,9 +23,19 @@ use App\Http\Controllers\Api\ApiCategoriaController;
     return $request->user();
 }); */
 
-Route::middleware(['cors'])->group(function () { Route::post('/usuarios', [ApiUsuarioController::class, 'store']); });
 
-Route::resource('/productos', ApiProductoController::class)-> names("productos");
-Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
-Route::resource('/usuarios', ApiUsuarioController::class)-> names("usuarios");
-Route::resource('/facturas', ApiFacturaController::class)-> names("facturas");
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::get('/user', [AuthController::class, 'me']);
+    Route::post('user/logout', [AuthController::class, 'logout']);
+   //  Route::middleware(['cors'])->group(function () { Route::post('/usuarios', [ApiUsuarioController::class, 'store']); });
+
+    Route::resource('/productos', ApiProductoController::class)-> names("productos");
+    Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
+    // Route::resource('/usuarios', ApiUsuarioController::class)->except(['store'])-> names("usuarios");
+    Route::resource('/facturas', ApiFacturaController::class)-> names("facturas");
+});
+
+Route::post('user/login', [AuthController::class, 'login']);
+Route::resource('/usuarios', ApiUsuarioController::class)->except(['store'])-> names("usuarios");
+Route::post('/usuarios', [ApiUsuarioController::class, 'store']);
+

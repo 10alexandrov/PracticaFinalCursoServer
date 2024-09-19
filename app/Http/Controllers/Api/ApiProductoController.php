@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\Categoria;
+use Illuminate\Support\Facades\Log;
 
 class ApiProductoController extends Controller
 {
@@ -14,9 +15,11 @@ class ApiProductoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $productos = Producto::all();
+        Log::info('Authorization header: ' . $request->header('Authorization'));
+
 
         $productos -> map(function($producto) {
             $producto -> p_nombre_categoria = $producto->categoria->c_nombre ?? 'unknown';
@@ -87,8 +90,8 @@ class ApiProductoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($producto_id)
     {
-        //
+        Producto::findOrFail($producto_id)->delete();
     }
 }

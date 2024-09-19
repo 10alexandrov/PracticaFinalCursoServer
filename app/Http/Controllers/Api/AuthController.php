@@ -25,7 +25,14 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Datos son incorrectos'], 401);
             }
 
-            return $this->respondWithToken($token);
+            $usuario = auth() -> user();    // Obtener usuario autorizado
+            $role = $usuario -> u_role;  // Obtener role de usuario
+            $tokenTTL = auth('api')->factory()->getTTL()*60;
+
+            return response () -> json ([
+                'token' => $token,
+                'role' => $role,
+                'expires_in' => $tokenTTL]);
         }
 
 

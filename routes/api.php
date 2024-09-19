@@ -29,8 +29,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('user/logout', [AuthController::class, 'logout']);
    //  Route::middleware(['cors'])->group(function () { Route::post('/usuarios', [ApiUsuarioController::class, 'store']); });
 
-    Route::resource('/productos', ApiProductoController::class)-> names("productos");
-    Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
+     Route::resource('/productos', ApiProductoController::class)-> names("productos");
+     Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
     // Route::resource('/usuarios', ApiUsuarioController::class)->except(['store'])-> names("usuarios");
     Route::resource('/facturas', ApiFacturaController::class)-> names("facturas");
 });
@@ -38,4 +38,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 Route::post('user/login', [AuthController::class, 'login']);
 Route::resource('/usuarios', ApiUsuarioController::class)->except(['store'])-> names("usuarios");
 Route::post('/usuarios', [ApiUsuarioController::class, 'store']);
+// Route::resource('/productos', ApiProductoController::class)-> names("productos");
+// Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
+
 

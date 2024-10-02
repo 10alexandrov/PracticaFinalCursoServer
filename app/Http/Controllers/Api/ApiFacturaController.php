@@ -16,7 +16,16 @@ class ApiFacturaController extends Controller
      */
     public function index()
     {
-        return $facturas = Factura::all();
+        $facturas = Factura::all();
+        // Log::info('Authorization header: ' . $request->header('Authorization'));
+
+
+        $facturas -> map(function($factura) {
+            $factura -> f_id_cliente = $factura->usuarioCliente -> u_nombre ?? 'unknown';
+            return $factura;
+        });
+
+        return $facturas;
     }
 
     /**
@@ -80,8 +89,8 @@ class ApiFacturaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($factura_id)
     {
-        //
+        Factura::findOrFail($factura_id)->delete();
     }
 }

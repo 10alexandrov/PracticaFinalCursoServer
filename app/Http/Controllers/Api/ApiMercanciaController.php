@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Usuario;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Mercancia;
+use Illuminate\Support\Facades\Log;
 
-class ApiUsuarioController extends Controller
+class ApiMercanciaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +16,9 @@ class ApiUsuarioController extends Controller
      */
     public function index()
     {
-        return $usuarios = Usuario::all();
+        $mercancias = Mercancia::all();
+
+        return $mercancias;
     }
 
     /**
@@ -38,36 +39,7 @@ class ApiUsuarioController extends Controller
      */
     public function store(Request $request)
     {
-
-        $validated = $request->validate([
-            'u_login' => 'required|unique:usuarios',
-        ]);
-
-        $usuario = new Usuario();
-        $usuario->u_password = Hash::make($request->u_password);
-        $usuario->u_nombre = $request->u_nombre;
-        $usuario->u_login = $validated['u_login'];
-        $usuario->u_role = $request->u_role;
-        $usuario->u_active = $request->u_active;
-
-        try {
-            $usuario->save();
-        } catch (\Exception $e) {
-             return response()->json([ 'error' => true, 'message' => $e->getMessage() ], 500);
-        }
-
-        return Response::json(array(
-            'error' => false,
-            'userId' => $request->u_nombre),
-            200
-        );
-     /*   $data = $request->except('_token');
-        Usuario::create($data);
-
-        return "Datos cargados correctamente";
-
-         $usuarios=Usuario::get();
-         return $usuarios = Usuario::all();*/
+        //
     }
 
     /**
@@ -78,7 +50,17 @@ class ApiUsuarioController extends Controller
      */
     public function show($id)
     {
-        //
+        // Log::info('Authorization header: ' . $request->header('Authorization'));
+
+        $mercancias = Mercancia::where('m_id_facturas', $id) -> get();
+
+
+        $mercancias -> map(function($mercancia) {
+            $mercancia -> m_nombre_producto = $mercancia->producto->p_nombre ?? 'unknown';
+            return $mercancia;
+        });
+
+        return $mercancias;
     }
 
     /**
@@ -101,10 +83,7 @@ class ApiUsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->except('_token');
-
-        Usuario::findOrFail($id) ->update($data);
-        return response()->json(['message' => 'Usuario update con success']);
+        //
     }
 
     /**
@@ -113,8 +92,8 @@ class ApiUsuarioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($usuario_id)
+    public function destroy($id)
     {
-        Usuario::findOrFail($usuario_id)->delete();
+        //
     }
 }

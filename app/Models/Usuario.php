@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Models\Factura;
 
 class Usuario extends Authenticatable implements JWTSubject
 {
@@ -40,6 +41,14 @@ class Usuario extends Authenticatable implements JWTSubject
      public function getAuthPassword () {
         return $this -> u_password;
      }
+
+     public function facturasClient(){
+        return $this->hasMany(Factura::class, 'usuario_id', 'f_id_cliente');
+    }
+
+    public function facturasResponsable(){
+        return $this->hasMany(Factura::class, 'usuario_id', 'f_id_responsable');
+    }
 
 }
 

@@ -18,10 +18,10 @@ class CrearTablaProductos extends Migration
             $table->string('p_nombre', 255);                   // Название продукта
             $table->unsignedBigInteger('p_categoria');             // Categoria
             $table->string('p_descripcion', 255)->nullable();  // Описание продукта (может быть пустым)
-            $table->decimal('p_ancho', 10, 2);                 // Ширина продукта
-            $table->decimal('p_longitud', 10, 2);              // Длина продукта
-            $table->decimal('p_altura', 10, 2);                // Высота продукта
-            $table->decimal('p_peso', 10, 2);                  // Вес продукта
+            $table->integer('p_ancho');                          // Ширина продукта
+            $table->integer('p_longitud');                      // Длина продукта
+            $table->integer('p_altura');                        // Высота продукта
+            $table->integer('p_peso');                        // Вес продукта
             $table->string('p_foto', 255)->nullable();         // Ссылка на фото продукта (может быть пустой)
             $table->integer('p_cantidad_almacen');             // Количество продукта на складе
             $table->integer('p_cantidad_entrega');             // Количество продукта в пути

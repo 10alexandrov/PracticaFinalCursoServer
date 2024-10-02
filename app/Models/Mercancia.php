@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Factura;
+use App\Models\Producto;
 
 class Mercancia extends Model
 {
@@ -23,10 +25,10 @@ class Mercancia extends Model
     ];
 
     public function factura () {
-        return $this->bellongsTo(Factura::class);
+        return $this->belongsTo(Factura::class, 'm_id_facturas', 'factura_id');
     }
 
     public function producto () {
-        return $this->bellongsTo(Producto::class);
+        return $this->belongsTo(Producto::class, 'm_id_productos', 'product_id');
     }
 }

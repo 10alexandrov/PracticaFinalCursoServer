@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ApiProductoController;
 use App\Http\Controllers\Api\ApiUsuarioController;
 use App\Http\Controllers\Api\ApiFacturaController;
 use App\Http\Controllers\Api\ApiCategoriaController;
+use App\Http\Controllers\Api\ApiMercanciaController;
 use App\Http\Controllers\Api\AuthController;
 
 /*
@@ -31,14 +32,15 @@ Route::group(['middleware' => 'auth:api'], function () {
 
      Route::resource('/productos', ApiProductoController::class)-> names("productos");
      Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
-    // Route::resource('/usuarios', ApiUsuarioController::class)->except(['store'])-> names("usuarios");
-    Route::resource('/facturas', ApiFacturaController::class)-> names("facturas");
+     Route::resource('/mercancias', ApiMercanciaController::class)-> names("mercancis");
+     Route::resource('/facturas', ApiFacturaController::class)-> names("facturas");
 });
 
 Route::post('user/login', [AuthController::class, 'login']);
 Route::resource('/usuarios', ApiUsuarioController::class)->except(['store'])-> names("usuarios");
 Route::post('/usuarios', [ApiUsuarioController::class, 'store']);
 // Route::resource('/productos', ApiProductoController::class)-> names("productos");
+// Route::resource('/mercancias', ApiMercanciaController::class)-> names("mercancis");
 // Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
 
 

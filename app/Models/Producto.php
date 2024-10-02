@@ -36,4 +36,8 @@ class Producto extends Model
         return $this->belongsTo(Categoria::class, 'p_categoria', 'id_categoria');
     }
 
+    public function mercancias(){
+        return $this->hasMany(Mercancia::class, 'product_id', 'm_id_productos');
+    }
+
 }

@@ -34,6 +34,7 @@ Route::group(['middleware' => 'auth:api'], function () {
      Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
      Route::resource('/mercancias', ApiMercanciaController::class)-> names("mercancis");
      Route::resource('/facturas', ApiFacturaController::class)-> names("facturas");
+     Route::resource('/estadistica', ApiFacturaController::class)-> names("estadistica");
 });
 
 Route::post('user/login', [AuthController::class, 'login']);

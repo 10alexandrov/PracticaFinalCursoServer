@@ -15,6 +15,7 @@ class Factura extends Model
     protected $fillable = [
         'factura_id',
         'f_id_cliente',
+        'f_suma',
         'f_tipo',
         'f_id_responsable',
         'f_aceptado',

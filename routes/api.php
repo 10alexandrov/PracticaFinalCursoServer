@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ApiFacturaController;
 use App\Http\Controllers\Api\ApiCategoriaController;
 use App\Http\Controllers\Api\ApiMercanciaController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ApiEstadisticasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,7 +35,7 @@ Route::group(['middleware' => 'auth:api'], function () {
      Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
      Route::resource('/mercancias', ApiMercanciaController::class)-> names("mercancis");
      Route::resource('/facturas', ApiFacturaController::class)-> names("facturas");
-     Route::resource('/estadistica', ApiFacturaController::class)-> names("estadistica");
+     // Route::resource('/estadistica', ApiEstadisticaController::class)-> names("estadistica");
 });
 
 Route::post('user/login', [AuthController::class, 'login']);
@@ -43,5 +44,6 @@ Route::post('/usuarios', [ApiUsuarioController::class, 'store']);
 // Route::resource('/productos', ApiProductoController::class)-> names("productos");
 // Route::resource('/mercancias', ApiMercanciaController::class)-> names("mercancis");
 // Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
+Route::resource('/estadistica', ApiEstadisticasController::class)-> names("estadistica");
 
 

@@ -24,6 +24,7 @@ class CrearTablaAnalitica extends Migration
             $table->decimal('e_suma_ventas_mes', 10, 2);
             $table->decimal('e_beneficios_hoy', 10, 2);
             $table->decimal('e_beneficios_mes', 10, 2);
+            $table->timestamps();
 
         });
     }

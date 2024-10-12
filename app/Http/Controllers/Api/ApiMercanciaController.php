@@ -48,16 +48,35 @@ class ApiMercanciaController extends Controller
 
             $data = $request->json()->all();
 
+            // Obtenemos suma de factura
             if (isset($data['f_suma'])) {
                 $sumaFactura = $data['f_suma'];
             } else {
                 $sumaFactura = 0;
             }
 
+            // Obtenemos direccion de factura
+            if (isset($data['role'])) {
+                if ($data['role'] === 'manager' || $data['role'] === 'vendedor' ) {
+                    $tipoFactura = 0;
+                } else {
+                    $tipoFactura = 1;
+                }
+            } else {
+                $tipoFactura = 1;
+            }
+
+            // Obtenemos usuario - author de factura
+            if (isset($data['usuario'])) {
+                $usuarioFactura = $data['usuario'];
+            } else {
+                $usuarioFactura = 1;
+            }
+
             // Creamos una factura nueva
             $factura = Factura::create([
-                'f_id_cliente' =>1,
-                'f_tipo' => 0,
+                'f_id_cliente' =>$usuarioFactura,
+                'f_tipo' => $tipoFactura,
                 'f_aceptado' => 0,
                 'f_suma' => $sumaFactura,
                 'f_suma_tramitacion' => 0

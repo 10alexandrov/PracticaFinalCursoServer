@@ -27,10 +27,12 @@ class AuthController extends Controller
 
             $usuario = auth() -> user();    // Obtener usuario autorizado
             $role = $usuario -> u_role;  // Obtener role de usuario
+            $usuario_id = $usuario -> usuario_id;
             $tokenTTL = auth('api')->factory()->getTTL()*60;
 
             return response () -> json ([
                 'token' => $token,
+                'usuario' => $usuario_id,
                 'role' => $role,
                 'expires_in' => $tokenTTL]);
         }

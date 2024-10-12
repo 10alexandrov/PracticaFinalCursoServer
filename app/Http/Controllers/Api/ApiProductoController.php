@@ -47,14 +47,8 @@ class ApiProductoController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->except('_token');
 
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('images', 'public');
-            $data['p_foto'] = $imagePath; // Asignar la ruta de la imagen al array de datos
-        } else {
-            $data['p_foto'] = null; // Asignar null si no hay imagen
-        }
+        $data = $request->except('_token');
 
         Producto::create($data);
     }
@@ -92,12 +86,13 @@ class ApiProductoController extends Controller
     {
         $data = $request->except('_token');
 
+        /*
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images', 'public');
             $data['p_foto'] = $imagePath; // Asignar la ruta de la imagen al array de datos
         } else {
             $data['p_foto'] = null; // Asignar null si no hay imagen
-        }
+        }*/
 
         Producto::findOrFail($id) ->update($data);
         return response()->json(['message' => 'Update con success']);

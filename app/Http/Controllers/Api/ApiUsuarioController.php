@@ -102,9 +102,14 @@ class ApiUsuarioController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->except('_token');
+        if (isset ($request->u_password)) {
+            $data['u_password'] = Hash::make($request->u_password);
+        }
 
         Usuario::findOrFail($id) ->update($data);
         return response()->json(['message' => 'Usuario update con success']);
+
+
     }
 
     /**

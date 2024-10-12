@@ -21,9 +21,10 @@ class ApiFacturaController extends Controller
 
 
         $facturas -> map(function($factura) {
-            $factura -> f_id_cliente = $factura->usuarioCliente -> u_nombre ?? 'unknown';
+            $factura -> usuario_cliente = $factura->usuarioCliente;
             return $factura;
         });
+
 
         return $facturas;
     }

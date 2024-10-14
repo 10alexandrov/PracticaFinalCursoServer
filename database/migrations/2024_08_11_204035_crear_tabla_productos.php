@@ -30,6 +30,7 @@ class CrearTablaProductos extends Migration
             $table->decimal('p_precio_compra', 10, 2);         // Цена закупки
             $table->decimal('p_precio_venta', 10, 2);          // Цена продажи
             $table->string('p_codigo', 255)            ;         // Codigo de barras
+            $table->boolean('p_activo');                         // producto active/inative
             $table->timestamps();                              // Добавляет столбцы created_at и updated_at
 
                         // Определение внешних ключей

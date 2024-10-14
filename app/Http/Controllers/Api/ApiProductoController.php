@@ -19,7 +19,27 @@ class ApiProductoController extends Controller
     {
         $productos = Producto::all();
         Log::info('Authorization header: ' . $request->header('Authorization'));
+        Log::info('Index: ' . $productos);
 
+
+        $productos -> map(function($producto) {
+            $producto -> p_nombre_categoria = $producto->categoria->c_nombre ?? 'unknown';
+            return $producto;
+        });
+
+        return $productos;
+    }
+
+        /**
+     * Display a listing of the resource with field ACTIVO.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function activos(Request $request)
+    {
+        Log::info('Prueba: ');
+        Log::info('Authorization header: ' . $request->header('Authorization'));
+        $productos = Producto::where('p_activo', true) -> get();
 
         $productos -> map(function($producto) {
             $producto -> p_nombre_categoria = $producto->categoria->c_nombre ?? 'unknown';

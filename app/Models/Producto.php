@@ -28,6 +28,7 @@ class Producto extends Model
         'p_cantidad_enviado',
         'p_precio_compra',
         'p_precio_venta',
+        'p_activo',
         'p_codigo',
         'p_nombre_categoria',
     ];

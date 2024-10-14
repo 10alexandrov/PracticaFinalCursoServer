@@ -24,18 +24,19 @@ use App\Http\Controllers\Api\ApiEstadisticasController;
 /* Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 }); */
-
+// Route::get('/productos/activos', [ApiProductoController::class, 'activos']);
 
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/user', [AuthController::class, 'me']);
     Route::post('user/logout', [AuthController::class, 'logout']);
    //  Route::middleware(['cors'])->group(function () { Route::post('/usuarios', [ApiUsuarioController::class, 'store']); });
 
+     Route::get('/productos/activos', [ApiProductoController::class, 'activos']);
      Route::resource('/productos', ApiProductoController::class)-> names("productos");
      Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
      Route::resource('/mercancias', ApiMercanciaController::class)-> names("mercancis");
      Route::resource('/facturas', ApiFacturaController::class)-> names("facturas");
-     // Route::resource('/estadistica', ApiEstadisticaController::class)-> names("estadistica");
+     Route::resource('/estadistica', ApiEstadisticasController::class)-> names("estadistica");
 });
 
 Route::post('user/login', [AuthController::class, 'login']);
@@ -44,6 +45,8 @@ Route::post('/usuarios', [ApiUsuarioController::class, 'store']);
 // Route::resource('/productos', ApiProductoController::class)-> names("productos");
 // Route::resource('/mercancias', ApiMercanciaController::class)-> names("mercancis");
 // Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
-Route::resource('/estadistica', ApiEstadisticasController::class)-> names("estadistica");
+// Route::resource('/estadistica', ApiEstadisticasController::class)-> names("estadistica");
+
+
 
 

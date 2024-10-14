@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Mercancia;
 use Illuminate\Support\Facades\Log;
 use App\Models\Factura;
+use App\Models\Producto;
 use App\Http\Controllers\Api\ApiMercanciaController;
 
 

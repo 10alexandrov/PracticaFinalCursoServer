@@ -39,6 +39,7 @@ Route::group(['middleware' => 'auth:api'], function () {
      Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
      Route::get('/mercancias/showWidthPlace/{id}', [ApiMercanciaController::class, 'showWidthPlace']);
      Route::post('/mercancias/aceptar/{id}', [ApiMercanciaController::class, 'aceptar']);
+     Route::post('/mercancias/aceptarycolocar/{id}', [ApiMercanciaController::class, 'aceptarycolocar']);
      Route::resource('/mercancias', ApiMercanciaController::class)-> names("mercancis");
      Route::resource('/facturas', ApiFacturaController::class)-> names("facturas");
      Route::resource('/estadistica', ApiEstadisticasController::class)-> names("estadistica");

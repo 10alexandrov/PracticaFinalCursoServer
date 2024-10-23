@@ -305,6 +305,7 @@ class ApiMercanciaController extends Controller
                             Log::info('do it');
                             $resto = $mercancia['m_cantidad_recogida']; // Cuantos unidades necesito colocar
                             $full = $producto['p_cantidad_palet'];  // Cuantos unidades en palet
+                            Log::info($resto);
 
                             do {
                                 Log::info('cikl do');
@@ -350,6 +351,9 @@ class ApiMercanciaController extends Controller
                                 Log::info($resto);
                             } while ($resto > 0);
 
+                        $mercancia['m_lugares'] = Lugar::where ('lugar_producto',$mercancia['m_id_productos']);
+                        Log::info($mercancia['m_lugares']);
+
                         } else {  // Si factura salida anadimos campo producto reservado y desminuir campo producto en almacen
                             Log::info('do it contrario');
                             $resto = $mercancia['m_cantidad_recogida']; // Cuantos unidades necesito colocar
@@ -384,6 +388,7 @@ class ApiMercanciaController extends Controller
                                 }
                                 Log::info($resto);
                             } while ($resto > 0);
+
                         }
 
                     } else {
@@ -392,7 +397,7 @@ class ApiMercanciaController extends Controller
                     }
                 }
 
-                    return response()->json(['message' => 'Продукты успешно сохранены'], 200);
+                    return $mercancias;
             } else {
                 // Обработка ошибки, если продукты не найдены
                     return response()->json(['error' => 'Продукты не найдены'], 400);
@@ -419,11 +424,13 @@ class ApiMercanciaController extends Controller
                 $lugar = Lugar::where('lugar_llenado', 0)
                             ->where('lugar_planta', $planta)
                             ->first();
-
+                            Log::info($planta);
                 if ($lugar) {
                     break;
                 }
             }
+            Log::info('yjdjt vtcnj');
+            Log::info($lugar);
 
             if ($lugar) {
 

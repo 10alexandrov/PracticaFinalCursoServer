@@ -31,6 +31,8 @@ class CrearTablaProductos extends Migration
             $table->decimal('p_precio_venta', 10, 2);          // Цена продажи
             $table->string('p_codigo', 255)            ;         // Codigo de barras
             $table->boolean('p_activo');                         // producto active/inative
+            $table->integer('p_cantidad_palet');        // cuanto productos en palet
+            $table->integer('p_peso_palet');             // cuanto pesa un palet
             $table->timestamps();                              // Добавляет столбцы created_at и updated_at
 
                         // Определение внешних ключей
@@ -49,6 +51,6 @@ class CrearTablaProductos extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('lugares');
     }
 }

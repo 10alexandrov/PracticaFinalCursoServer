@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Categoria;
+use App\Models\Mercancia;
+use App\Models\Lugar;
 
 class Producto extends Model
 {
@@ -31,6 +33,8 @@ class Producto extends Model
         'p_activo',
         'p_codigo',
         'p_nombre_categoria',
+        'p_cantidad_palet',
+        'p_peso_palet'
     ];
 
     public function categoria () {
@@ -39,6 +43,10 @@ class Producto extends Model
 
     public function mercancias(){
         return $this->hasMany(Mercancia::class, 'product_id', 'm_id_productos');
+    }
+
+    public function lugares(){
+        return $this->hasMany(Lugar::class, 'product_id', 'lugar_producto');
     }
 
 }

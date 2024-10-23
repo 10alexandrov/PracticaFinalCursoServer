@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ApiCategoriaController;
 use App\Http\Controllers\Api\ApiMercanciaController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ApiEstadisticasController;
+use App\Http\Controllers\Api\ApiLugarController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,16 +25,20 @@ use App\Http\Controllers\Api\ApiEstadisticasController;
 /* Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 }); */
-// Route::get('/productos/activos', [ApiProductoController::class, 'activos']);
+// Route::resource('/lugares', ApiLugarController::class)->names("lugares");
+// Route::post('/mercancias/aceptar/{id}', [ApiMercanciaController::class, 'aceptar']);
 
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/user', [AuthController::class, 'me']);
     Route::post('user/logout', [AuthController::class, 'logout']);
    //  Route::middleware(['cors'])->group(function () { Route::post('/usuarios', [ApiUsuarioController::class, 'store']); });
 
+     Route::resource('/lugares', ApiLugarController::class)->names("lugares");
      Route::get('/productos/activos', [ApiProductoController::class, 'activos']);
      Route::resource('/productos', ApiProductoController::class)-> names("productos");
      Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
+     Route::get('/mercancias/showWidthPlace/{id}', [ApiMercanciaController::class, 'showWidthPlace']);
+     Route::post('/mercancias/aceptar/{id}', [ApiMercanciaController::class, 'aceptar']);
      Route::resource('/mercancias', ApiMercanciaController::class)-> names("mercancis");
      Route::resource('/facturas', ApiFacturaController::class)-> names("facturas");
      Route::resource('/estadistica', ApiEstadisticasController::class)-> names("estadistica");

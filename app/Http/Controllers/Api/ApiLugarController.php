@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Producto;
@@ -97,4 +98,39 @@ class ApiLugarController extends Controller
     {
         //
     }
+
+
+        // function para cambiar celdas
+
+        public function cambiar (Request $request) {
+
+            try {
+
+                DB::beginTransaction();  // Empesar transaction
+
+                $data = $request->json()->all();
+
+                $firstId = $data['firstCelda'];
+                $secondId = $data['secondCelda'];
+
+                $firstLugar = Lugar::findOrFail($firstId);
+                $secondLugar = Lugar::findOrFail($secondId);
+
+                $firstLugarData = $firstLugar->only(['lugar_producto', 'lugar_cantidad', 'lugar_llenado']);
+                $secondLugarData = $secondLugar->only(['lugar_producto', 'lugar_cantidad', 'lugar_llenado']);
+
+                $firstLugar -> update($secondLugarData);
+                $secondLugar -> update($firstLugarData);
+
+                DB::commit();
+
+                return $this -> index();
+
+            } catch (\Exception $exception) {
+                DB::rollBack();
+                Log::info($exception);
+                return $exception -> getMessage();
+            }
+
+        }
 }

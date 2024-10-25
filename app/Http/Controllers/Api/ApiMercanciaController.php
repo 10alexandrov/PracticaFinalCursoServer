@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Mercancia;
 use Illuminate\Support\Facades\Log;
@@ -243,165 +244,185 @@ class ApiMercanciaController extends Controller
      */
     public function aceptar(Request $request, $id)
     {
-        Log::info($id);
-        $data = $request->json()->all();
-        $date = Carbon::now ();
+        try {
 
-        if (isset($data['f_suma'])) {
-            $sumaFactura = $data['f_suma'];
-        } else {
-            $sumaFactura = 0;
-        }
+            DB::beginTransaction();  // Empesar transaction
 
-        if (isset($data['aceptarFactura'])) {
-            $f_aceptado = $data['aceptarFactura'];
-        } else {
-            $f_aceptado = 0;
-        }
+            Log::info($id);
+            $data = $request->json()->all();
+            $date = Carbon::now ();
 
-        if (isset($data['usuario'])) {
-            $f_id_responsable = $data['usuario'];
-        } else {
-            $f_id_responsable = 1;
-        }
+            if (isset($data['f_suma'])) {
+                $sumaFactura = $data['f_suma'];
+            } else {
+                $sumaFactura = 0;
+            }
 
-        $facturaControlado = Factura::findOrFail($id);  // renovar datos de la factura
-        $tipoFactura = $facturaControlado -> f_tipo;
-            $facturaControlado->update(['f_suma_tramitacion' => $sumaFactura,
-                                        'f_aceptado'=> $f_aceptado,
-                                        'f_fecha_tramitacion' => $date,
-                                        'f_id_responsable' => $f_id_responsable]);
+            if (isset($data['aceptarFactura'])) {
+                $f_aceptado = $data['aceptarFactura'];
+            } else {
+                $f_aceptado = 0;
+            }
+
+            if (isset($data['usuario'])) {
+                $f_id_responsable = $data['usuario'];
+            } else {
+                $f_id_responsable = 1;
+            }
+
+            $facturaControlado = Factura::findOrFail($id);  // renovar datos de la factura
+            $tipoFactura = $facturaControlado -> f_tipo;
+                $facturaControlado->update(['f_suma_tramitacion' => $sumaFactura,
+                                            'f_aceptado'=> $f_aceptado,
+                                            'f_fecha_tramitacion' => $date,
+                                            'f_id_responsable' => $f_id_responsable]);
 
 
 
-        // Grabar datos de nuevo
+            // Grabar datos de nuevo
 
-            if (isset($data['mercancias']) && is_array($data['mercancias'])) {
-                $mercancias = $data['mercancias'];
+                if (isset($data['mercancias']) && is_array($data['mercancias'])) {
+                    $mercancias = $data['mercancias'];
 
-                foreach ($mercancias as $mercancia) {
+                    foreach ($mercancias as &$mercancia) {
 
-                    if (isset($mercancia['id'])) {
-                        Mercancia::where ('id', $mercancia['id'])-> update([
-                            'm_cantidad_recogida' => $mercancia['m_cantidad_recogida'],
-                            'm_suma_recogida' => $mercancia['m_suma_recogida'],
-                            'm_aceptado' => $mercancia['m_aceptado'],
-                        ]);
+                        if (isset($mercancia['id'])) {
+                            Mercancia::where ('id', $mercancia['id'])-> update([
+                                'm_cantidad_recogida' => $mercancia['m_cantidad_recogida'],
+                                'm_suma_recogida' => $mercancia['m_suma_recogida'],
+                                'm_aceptado' => $mercancia['m_aceptado'],
+                            ]);
 
-                        //  Corregir datos de restos en tabla productos
+                            //  Corregir datos de restos en tabla productos
 
-                        $producto = Producto::findOrFail($mercancia['m_id_productos']);
+                            $producto = Producto::findOrFail($mercancia['m_id_productos']);
 
-                        if ($tipoFactura == 0) {  // Si factura entrada anadimos campo producto enviado
-                            $producto->decrement('p_cantidad_entrega',$mercancia['m_cantidad_recogida']);
-                            $producto->increment('p_cantidad_almacen',$mercancia['m_cantidad_recogida']);
-                        } else {  // Si factura salida anadimos campo producto reservado y desminuir campo producto en almacen
-                            $producto->decrement('p_cantidad_reservado', $mercancia['m_cantidad_recogida']);
-                            $producto->increment('p_cantidad_enviado',$mercancia['m_cantidad_recogida']);
-                        }
+                            if ($tipoFactura == 0) {  // Si factura entrada anadimos campo producto enviado
+                                $producto->decrement('p_cantidad_entrega',$mercancia['m_cantidad_recogida']);
+                                $producto->increment('p_cantidad_almacen',$mercancia['m_cantidad_recogida']);
+                            } else {  // Si factura salida anadimos campo producto reservado y desminuir campo producto en almacen
+                                $producto->decrement('p_cantidad_reservado', $mercancia['m_cantidad_recogida']);
+                                $producto->increment('p_cantidad_enviado',$mercancia['m_cantidad_recogida']);
+                            }
 
-                        // Logica de lugar en almacen     **************************
-                        if ($tipoFactura == 0) {  // Si factura entrada
-                            Log::info('do it');
-                            $resto = $mercancia['m_cantidad_recogida']; // Cuantos unidades necesito colocar
-                            $full = $producto['p_cantidad_palet'];  // Cuantos unidades en palet
-                            Log::info($resto);
+                            // Logica de lugar en almacen     **************************
+                            if ($tipoFactura == 0) {  // Si factura entrada
+                                Log::info('zapuskaem tip factura 0 para producto:');
+                                Log::info($mercancia['m_id_productos']);
+                                $resto = $mercancia['m_cantidad_recogida']; // Cuantos unidades necesito colocar
+                                $full = $producto['p_cantidad_palet'];  // Cuantos unidades en palet
+                                Log::info('ostatok tovara:');
+                                Log::info($resto);
 
-                            do {
-                                Log::info('cikl do');
-                                $lugar = Lugar::where('lugar_producto',$mercancia['m_id_productos']) ->
-                                                where('lugar_cantidad', '<', $full) -> first ();  // buscamos lugar con producto
+                                do {
+                                    Log::info('cikl do');
+                                    $lugar = Lugar::where('lugar_producto',$mercancia['m_id_productos']) ->
+                                                    where('lugar_cantidad', '<', $full) -> first ();  // buscamos lugar con producto
 
-                                if (!$lugar) { // si no hay lugares con producto
-                                    Log::info('nuevo lugar');
-                                    $lugar = $this -> buscarLugarNuevo();   // buscamos lugar nuevo
-                                    $lugar -> lugar_producto = $mercancia['m_id_productos'];
+                                    if (!$lugar) { // si no hay lugares con producto
+                                        Log::info('buscamos nuevo lugar');
+                                        $lugar = $this -> buscarLugarNuevo();   // buscamos lugar nuevo
+                                        $lugar -> lugar_producto = $mercancia['m_id_productos'];
 
-                                    if ($full > $resto) {
-                                        Log::info('$full > $resto');
-                                        $lugar -> lugar_cantidad = $resto;
-                                        $lugar -> lugar_llenado = $resto/$producto->p_cantidad_palet;
+                                        if ($full > $resto) {
+                                            Log::info('$full > $resto');
+                                            $lugar -> lugar_cantidad = $resto;
+                                            $lugar -> lugar_llenado = $resto/$producto->p_cantidad_palet;
+                                            $resto = 0;
+                                        } else {
+                                            Log::info('$full < $resto');
+                                            $lugar -> lugar_cantidad = $full;
+                                            $lugar -> lugar_llenado = 100;
+                                            $resto -= $full;
+                                        }
+
+                                        $lugar -> save();
+                                    } else {   // si hay celda desponible
+                                        Log::info('celda desponible');
+                                        $restoEnCelda = $full - $lugar ->lugar_cantidad; // Cantar cuanto colocamos en esta celda
+
+                                        if ($restoEnCelda > $mercancia['m_cantidad_recogida']) {
+                                            Log::info('$restoEnCelda > $mercancia');
+                                            $lugar ->lugar_cantidad += $mercancia['m_cantidad_recogida'];  // Colocamos producto a celda
+                                            $lugar -> lugar_llenado = ($lugar ->lugar_cantidad/$producto->p_cantidad_palet)*100;  // Cambiar lli¡enado de la celda
+
+                                            $resto = 0; //  Poner a cero el resto
+                                        } else {
+                                            Log::info('$restoEnCelda < $mercancia');
+                                            $lugar ->lugar_cantidad += $restoEnCelda;  // Colocamos producto a celda
+                                            $lugar -> lugar_llenado = 100; // La Celda es llena
+                                            $resto -= $restoEnCelda;  // Diminuir cantidad de factura
+                                        }
+                                        $lugar -> save();
+                                    }
+                                    Log::info('ostatok:');
+                                    Log::info($resto);
+                                } while ($resto > 0);
+
+                            $mercancia['m_lugares'] = Lugar::where ('lugar_producto',$mercancia['m_id_productos']) -> get ();
+                            Log::info('LUGARES');
+                            Log::info($mercancia['m_lugares']);
+
+
+                            } else {  // Si factura salida anadimos campo producto reservado y desminuir campo producto en almacen
+                                Log::info('do it contrario');
+                                $resto = $mercancia['m_cantidad_recogida']; // Cuantos unidades necesito colocar
+                                $full = $producto['p_cantidad_palet'];  // Cuantos unidades en palet
+
+                                do {
+                                    Log::info('cikl do');
+                                    $lugar = Lugar::where('lugar_producto',$mercancia['m_id_productos']) -> first ();  // buscamos lugar con producto
+
+                                    if (!$lugar) { // si no hay lugares con producto
+                                        Log::info('Error');
                                         $resto = 0;
-                                    } else {
-                                        Log::info('$full < $resto');
-                                        $lugar -> lugar_cantidad = $full;
-                                        $lugar -> lugar_llenado = 100;
-                                        $resto -= $full;
+
+
+                                    } else {   // si hay celda con mercancia
+                                        Log::info('hay mercancia');
+
+                                        if ($lugar -> lugar_cantidad > $resto) {   // Si en la selda cantidad mas que necesito
+                                            Log::info('$EnCelda > $mercancia');
+                                            $lugar ->lugar_cantidad -= $resto;  // disminuir producto a celda
+                                            $lugar -> lugar_llenado = ($lugar ->lugar_cantidad/$producto->p_cantidad_palet)*100;  // Cambiar lli¡enado de la celda
+
+                                            $resto = 0; //  Poner a cero el resto
+                                        } else {
+                                            Log::info('$EnCelda < $mercancia');
+                                            $resto -= $lugar ->lugar_cantidad;  // Diminuir cantidad el celda
+                                            $lugar -> lugar_cantidad = 0;  // Poner a cero el resto en la celda
+                                            $lugar -> lugar_llenado = 0; // Poner a cero llenado en la celda
+                                            $lugar -> lugar_producto = 0; //  borramos info sobre producto
+                                        }
+                                        $lugar -> save();
                                     }
+                                    Log::info($resto);
+                                } while ($resto > 0);
 
-                                    $lugar -> save();
-                                } else {   // si hay celda desponible
-                                    Log::info('celda desponible');
-                                    $restoEnCelda = $full - $lugar ->lugar_cantidad; // Cantar cuanto colocamos en esta celda
+                            }
 
-                                    if ($restoEnCelda > $mercancia['m_cantidad_recogida']) {
-                                        Log::info('$restoEnCelda > $mercancia');
-                                        $lugar ->lugar_cantidad += $mercancia['m_cantidad_recogida'];  // Colocamos producto a celda
-                                        $lugar -> lugar_llenado = ($lugar ->lugar_cantidad/$producto->p_cantidad_palet)*100;  // Cambiar lli¡enado de la celda
-
-                                        $resto = 0; //  Poner a cero el resto
-                                    } else {
-                                        Log::info('$restoEnCelda < $mercancia');
-                                        $lugar ->lugar_cantidad += $restoEnCelda;  // Colocamos producto a celda
-                                        $lugar -> lugar_llenado = 100; // La Celda es llena
-                                        $resto -= $restoEnCelda;  // Diminuir cantidad de factura
-                                    }
-                                    $lugar -> save();
-                                }
-                                Log::info($resto);
-                            } while ($resto > 0);
-
-                        $mercancia['m_lugares'] = Lugar::where ('lugar_producto',$mercancia['m_id_productos']);
-                        Log::info($mercancia['m_lugares']);
-
-                        } else {  // Si factura salida anadimos campo producto reservado y desminuir campo producto en almacen
-                            Log::info('do it contrario');
-                            $resto = $mercancia['m_cantidad_recogida']; // Cuantos unidades necesito colocar
-                            $full = $producto['p_cantidad_palet'];  // Cuantos unidades en palet
-
-                            do {
-                                Log::info('cikl do');
-                                $lugar = Lugar::where('lugar_producto',$mercancia['m_id_productos']) -> first ();  // buscamos lugar con producto
-
-                                if (!$lugar) { // si no hay lugares con producto
-                                    Log::info('Error');
-                                    $resto = 0;
-
-
-                                } else {   // si hay celda con mercancia
-                                    Log::info('hay mercancia');
-
-                                    if ($lugar -> lugar_cantidad > $resto) {   // Si en la selda cantidad mas que necesito
-                                        Log::info('$EnCelda > $mercancia');
-                                        $lugar ->lugar_cantidad -= $resto;  // disminuir producto a celda
-                                        $lugar -> lugar_llenado = ($lugar ->lugar_cantidad/$producto->p_cantidad_palet)*100;  // Cambiar lli¡enado de la celda
-
-                                        $resto = 0; //  Poner a cero el resto
-                                    } else {
-                                        Log::info('$EnCelda < $mercancia');
-                                        $resto -= $lugar ->lugar_cantidad;  // Diminuir cantidad el celda
-                                        $lugar -> lugar_cantidad = 0;  // Poner a cero el resto en la celda
-                                        $lugar -> lugar_llenado = 0; // Poner a cero llenado en la celda
-                                        $lugar -> lugar_producto = 0; //  borramos info sobre producto
-                                    }
-                                    $lugar -> save();
-                                }
-                                Log::info($resto);
-                            } while ($resto > 0);
-
+                        } else {
+                            // Обработка ошибки, если данные продукта неполные
+                            return response()->json(['error' => 'Данные продукта неполные'], 400);
                         }
-
-                    } else {
-                        // Обработка ошибки, если данные продукта неполные
-                        return response()->json(['error' => 'Данные продукта неполные'], 400);
                     }
+
+
+                } else {
+                    // Обработка ошибки, если продукты не найдены
+                        return response()->json(['error' => 'Продукты не найдены'], 400);
                 }
 
-                    return $mercancias;
-            } else {
-                // Обработка ошибки, если продукты не найдены
-                    return response()->json(['error' => 'Продукты не найдены'], 400);
+                Log::info('Antes de commit');
+                DB::commit();
+
+            } catch (\Exception $exception) {
+                return $exception -> getMessage();
             }
+
+            return $mercancias;
+
+            Log::info ($mercancias);
     }
 
     /**
@@ -421,7 +442,7 @@ class ApiMercanciaController extends Controller
         $plantas = [1, 2, 3];
 
             foreach ($plantas as $planta) {
-                $lugar = Lugar::where('lugar_llenado', 0)
+                $lugar = Lugar::where('lugar_cantidad', 0)
                             ->where('lugar_planta', $planta)
                             ->first();
                             Log::info($planta);
@@ -429,7 +450,7 @@ class ApiMercanciaController extends Controller
                     break;
                 }
             }
-            Log::info('yjdjt vtcnj');
+            Log::info('Lugar:');
             Log::info($lugar);
 
             if ($lugar) {

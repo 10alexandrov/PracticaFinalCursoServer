@@ -33,6 +33,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('user/logout', [AuthController::class, 'logout']);
    //  Route::middleware(['cors'])->group(function () { Route::post('/usuarios', [ApiUsuarioController::class, 'store']); });
 
+     Route::put('/lugares/cambiar',[ApiLugarController::class,'cambiar']);
      Route::resource('/lugares', ApiLugarController::class)->names("lugares");
      Route::get('/productos/activos', [ApiProductoController::class, 'activos']);
      Route::resource('/productos', ApiProductoController::class)-> names("productos");

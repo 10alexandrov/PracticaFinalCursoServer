@@ -57,9 +57,7 @@ class ApiLugarController extends Controller
      */
     public function show($id)
     {
-        Log::info($id);
         $lugar = Lugar::findOrFail($id);
-        Log::info($lugar);
         $lugar -> lugar_productoInfo = $lugar->producto ?? 'disponible';
 
         return $lugar;

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Factura;
 use App\Models\Producto;
 use App\Models\Lugar;
-use App\Models\Estadisticas;
+use App\Models\Estadistica;
 use App\Http\Controllers\Api\ApiMercanciaController;
 use Carbon\Carbon;
 
@@ -47,9 +47,9 @@ class ApiMercanciaController extends Controller
      */
     public function store(Request $request)
     {
+        try {
 
-            // Получите массив объектов из запроса
-            // $mercancias = $request->input('mercancias');
+            DB::beginTransaction();  // Empesar transaction
 
             $data = $request->json()->all();
 
@@ -61,15 +61,8 @@ class ApiMercanciaController extends Controller
             }
 
             // Obtenemos direccion de factura
-            if (isset($data['role'])) {
-                if ($data['role'] === 'manager' || $data['role'] === 'vendedor' ) {
-                    $tipoFactura = 0;
-                } else {
-                    $tipoFactura = 1;
-                }
-            } else {
-                $tipoFactura = 1;
-            }
+
+            $tipoFactura = $this -> obtenerTipoFactura ($data['role']);
 
             // Obtenemos usuario - author de factura
             if (isset($data['usuario'])) {
@@ -87,45 +80,26 @@ class ApiMercanciaController extends Controller
                 'f_suma_tramitacion' => 0
             ]);
 
+            // Obtenemos numero de factura
             $facturaId = $factura -> factura_id;
 
-            // Убедитесь, что поле 'products' существует и это массив
             if (isset($data['mercancias']) && is_array($data['mercancias'])) {
                 $mercancias = $data['mercancias'];
-
                 foreach ($mercancias as $mercancia) {
-                    // Проверить, что все необходимые поля присутствуют
-                    if (isset($mercancia['m_id_productos']) && isset($mercancia['m_cantidad_pedida'])) {
-                        Mercancia::create([
-                            'm_id_facturas' => $facturaId, // Убедитесь, что $facturaId определен
-                            'm_id_productos' => $mercancia['m_id_productos'],
-                            'm_cantidad_pedida' => $mercancia['m_cantidad_pedida'],
-                            'm_suma_pedida' => $mercancia['m_suma_pedida'],
-                        ]);
-
-                        // Anadimos datos de tabala de producto
-
-                            $producto = Producto::findOrFail($mercancia['m_id_productos']);
-
-                        if ($tipoFactura == 0) {  // Si factura entrada anadimos campo producto enviado
-                            $producto->increment('p_cantidad_entrega',$mercancia['m_cantidad_pedida']);
-                        } else {  // Si factura salida anadimos campo producto reservado y desminuir campo producto en almacen
-                            $producto->decrement('p_cantidad_almacen', $mercancia['m_cantidad_pedida']);
-                            $producto->increment('p_cantidad_reservado',$mercancia['m_cantidad_pedida']);
-                        }
-
-
-                    } else {
-                        // Обработка ошибки, если данные продукта неполные
-                        return response()->json(['error' => 'Данные продукта неполные'], 400);
-                    }
+                    $this -> saveMercancia ($mercancia, $facturaId, $tipoFactura);  // guardamos mercancia a BD
                 }
 
-                    return response()->json(['message' => 'Продукты успешно сохранены'], 200);
+                DB::commit();
+                return response()->json(['message' => 'Datos guardadodos correctamente'], 200);
             } else {
-                // Обработка ошибки, если продукты не найдены
-                    return response()->json(['error' => 'Продукты не найдены'], 400);
+                return response()->json(['error' => 'No hay productos'], 400);
             }
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            Log::info($exception);
+            return $exception -> getMessage();
+        }
     }
 
     /**
@@ -136,7 +110,6 @@ class ApiMercanciaController extends Controller
      */
     public function show($id)
     {
-        // Log::info('Authorization header: ' . $request->header('Authorization'));
 
         $mercancias = Mercancia::where('m_id_facturas', $id) -> get();
 
@@ -162,7 +135,7 @@ class ApiMercanciaController extends Controller
                 $lugar = Lugar::where('lugar_producto', $mercancia -> m_id_productos) -> first();  // Buscamos producto primero
 
                 if ($lugar) {
-                    $mercancia  -> m_lugar = $lugar -> lugar_estanteria . "-" . $lugar -> lugar_column . "-" . $lugar -> lugar_planta;
+                    $mercancia  -> m_lugar = $lugar -> lugar_estanteria . "-" . $lugar -> lugar_planta . "-" . $lugar -> lugar_column;
                 } else {
                     $mercancia  -> m_lugar = "No hay en Almacen";
                 }
@@ -195,43 +168,40 @@ class ApiMercanciaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Log::info($id);
-        $data = $request->json()->all();
+        try {
 
-        if (isset($data['f_suma'])) {
-            $sumaFactura = $data['f_suma'];
-        } else {
-            $sumaFactura = 0;
-        }
+            DB::beginTransaction();  // Empesar transaction
+            $data = $request->json()->all();
 
-        Factura::findOrFail($id)->update(['f_suma' => $data['f_suma']]);  /** Update factura */
-        Mercancia::where('m_id_facturas', $id) -> delete();   /**Borrar datos viejos **/
-
-        // Grabar datos de nuevo
-
-            if (isset($data['mercancias']) && is_array($data['mercancias'])) {
-                $mercancias = $data['mercancias'];
-
-                foreach ($mercancias as $mercancia) {
-
-                    if (isset($mercancia['m_id_productos']) && isset($mercancia['m_cantidad_pedida'])) {
-                        Mercancia::create([
-                            'm_id_facturas' => $id, // Убедитесь, что $facturaId определен
-                            'm_id_productos' => $mercancia['m_id_productos'],
-                            'm_cantidad_pedida' => $mercancia['m_cantidad_pedida'],
-                            'm_suma_pedida' => $mercancia['m_suma_pedida'],
-                        ]);
-                    } else {
-                        // Обработка ошибки, если данные продукта неполные
-                        return response()->json(['error' => 'Данные продукта неполные'], 400);
-                    }
-                }
-
-                    return response()->json(['message' => 'Продукты успешно сохранены'], 200);
+            if (isset($data['f_suma'])) {
+                $sumaFactura = $data['f_suma'];
             } else {
-                // Обработка ошибки, если продукты не найдены
-                    return response()->json(['error' => 'Продукты не найдены'], 400);
+                $sumaFactura = 0;
             }
+
+            $facturaControlado = Factura::findOrFail($id);  // renovar datos de la factura
+            $facturaControlado ->update(['f_suma' => $data['f_suma']]);  /** Update factura */
+            $tipoFactura = $facturaControlado -> f_tipo;    // Obtener tipo factura compra/venta
+            $mercanciasViejo = Mercancia::where('m_id_facturas', $id) -> get(); // Guardar datos viejos
+            Mercancia::where('m_id_facturas', $id) -> delete();   /**Borrar datos viejos **/
+
+            // Grabar datos de nuevo
+            if (isset($data['mercancias']) && is_array($data['mercancias'])) {
+                $this -> updateMercancias ($data['mercancias'], $mercanciasViejo,  $id, $tipoFactura);
+                DB::commit();
+                return response()->json(['message' => 'Datos guardadodos correctamente'], 200);
+
+            } else {
+
+                return response()->json(['error' => 'No hay mercancias'], 400);
+            }
+
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            Log::info($exception);
+            return $exception -> getMessage();
+        }
     }
 
 
@@ -248,7 +218,6 @@ class ApiMercanciaController extends Controller
 
             DB::beginTransaction();  // Empesar transaction
 
-            Log::info($id);
             $data = $request->json()->all();
             $date = Carbon::now ();
 
@@ -307,30 +276,22 @@ class ApiMercanciaController extends Controller
 
                             // Logica de lugar en almacen     **************************
                             if ($tipoFactura == 0) {  // Si factura entrada
-                                Log::info('zapuskaem tip factura 0 para producto:');
-                                Log::info($mercancia['m_id_productos']);
                                 $resto = $mercancia['m_cantidad_recogida']; // Cuantos unidades necesito colocar
                                 $full = $producto['p_cantidad_palet'];  // Cuantos unidades en palet
-                                Log::info('ostatok tovara:');
-                                Log::info($resto);
 
                                 do {
-                                    Log::info('cikl do');
                                     $lugar = Lugar::where('lugar_producto',$mercancia['m_id_productos']) ->
                                                     where('lugar_cantidad', '<', $full) -> first ();  // buscamos lugar con producto
 
                                     if (!$lugar) { // si no hay lugares con producto
-                                        Log::info('buscamos nuevo lugar');
                                         $lugar = $this -> buscarLugarNuevo();   // buscamos lugar nuevo
                                         $lugar -> lugar_producto = $mercancia['m_id_productos'];
 
                                         if ($full > $resto) {
-                                            Log::info('$full > $resto');
                                             $lugar -> lugar_cantidad = $resto;
                                             $lugar -> lugar_llenado = $resto/$producto->p_cantidad_palet;
                                             $resto = 0;
                                         } else {
-                                            Log::info('$full < $resto');
                                             $lugar -> lugar_cantidad = $full;
                                             $lugar -> lugar_llenado = 100;
                                             $resto -= $full;
@@ -338,11 +299,9 @@ class ApiMercanciaController extends Controller
 
                                         $lugar -> save();
                                     } else {   // si hay celda desponible
-                                        Log::info('celda desponible');
                                         $restoEnCelda = $full - $lugar ->lugar_cantidad; // Cantar cuanto colocamos en esta celda
 
                                         if ($restoEnCelda > $mercancia['m_cantidad_recogida']) {
-                                            Log::info('$restoEnCelda > $mercancia');
                                             $lugar ->lugar_cantidad += $mercancia['m_cantidad_recogida'];  // Colocamos producto a celda
                                             $lugar -> lugar_llenado = ($lugar ->lugar_cantidad/$producto->p_cantidad_palet)*100;  // Cambiar lli¡enado de la celda
 
@@ -355,40 +314,31 @@ class ApiMercanciaController extends Controller
                                         }
                                         $lugar -> save();
                                     }
-                                    Log::info('ostatok:');
-                                    Log::info($resto);
+
                                 } while ($resto > 0);
 
                             $mercancia['m_lugares'] = Lugar::where ('lugar_producto',$mercancia['m_id_productos']) -> get ();
-                            Log::info('LUGARES');
-                            Log::info($mercancia['m_lugares']);
 
 
                             } else {  // Si factura salida anadimos campo producto reservado y desminuir campo producto en almacen
-                                Log::info('do it contrario');
+
                                 $resto = $mercancia['m_cantidad_recogida']; // Cuantos unidades necesito colocar
                                 $full = $producto['p_cantidad_palet'];  // Cuantos unidades en palet
 
                                 do {
-                                    Log::info('cikl do');
                                     $lugar = Lugar::where('lugar_producto',$mercancia['m_id_productos']) -> first ();  // buscamos lugar con producto
 
                                     if (!$lugar) { // si no hay lugares con producto
-                                        Log::info('Error');
                                         $resto = 0;
 
-
                                     } else {   // si hay celda con mercancia
-                                        Log::info('hay mercancia');
 
                                         if ($lugar -> lugar_cantidad > $resto) {   // Si en la selda cantidad mas que necesito
-                                            Log::info('$EnCelda > $mercancia');
                                             $lugar ->lugar_cantidad -= $resto;  // disminuir producto a celda
                                             $lugar -> lugar_llenado = ($lugar ->lugar_cantidad/$producto->p_cantidad_palet)*100;  // Cambiar lli¡enado de la celda
 
                                             $resto = 0; //  Poner a cero el resto
                                         } else {
-                                            Log::info('$EnCelda < $mercancia');
                                             $resto -= $lugar ->lugar_cantidad;  // Diminuir cantidad el celda
                                             $lugar -> lugar_cantidad = 0;  // Poner a cero el resto en la celda
                                             $lugar -> lugar_llenado = 0; // Poner a cero llenado en la celda
@@ -396,7 +346,7 @@ class ApiMercanciaController extends Controller
                                         }
                                         $lugar -> save();
                                     }
-                                    Log::info($resto);
+
                                 } while ($resto > 0);
 
                             }
@@ -413,7 +363,10 @@ class ApiMercanciaController extends Controller
                         return response()->json(['error' => 'Продукты не найдены'], 400);
                 }
 
-                Log::info('Antes de commit');
+                if ($f_aceptado) {  // si factura esta aceptado - anadimos estadisticas
+                    $this -> estadisticas ($id, $facturaControlado, $data['mercancias']);
+                }
+
                 DB::commit();
 
             } catch (\Exception $exception) {
@@ -445,13 +398,10 @@ class ApiMercanciaController extends Controller
                 $lugar = Lugar::where('lugar_cantidad', 0)
                             ->where('lugar_planta', $planta)
                             ->first();
-                            Log::info($planta);
                 if ($lugar) {
                     break;
                 }
             }
-            Log::info('Lugar:');
-            Log::info($lugar);
 
             if ($lugar) {
 
@@ -460,4 +410,216 @@ class ApiMercanciaController extends Controller
                 return null;
             }
         }
+
+        // function para obtener tipo factura 0 = compra 1 = venta
+        private function obtenerTipoFactura ($data) {
+            if ($data) {
+                if ($data === 'manager' || $data === 'vendedor' ) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            } else {
+                return 1;
+            }
+        }
+
+    // function para guardar mercancia
+    private function saveMercancia ($mercancia, $facturaId, $tipoFactura) {
+
+        if (isset($mercancia['m_id_productos']) && isset($mercancia['m_cantidad_pedida'])) {
+            Mercancia::create([
+                'm_id_facturas' => $facturaId,
+                'm_id_productos' => $mercancia['m_id_productos'],
+                'm_cantidad_pedida' => $mercancia['m_cantidad_pedida'],
+                'm_suma_pedida' => $mercancia['m_suma_pedida'],
+            ]);
+
+            // Anadimos datos de tabala de producto
+
+            $producto = Producto::findOrFail($mercancia['m_id_productos']);
+
+            if ($tipoFactura == 0) {  // Si factura entrada anadimos campo producto enviado
+                $producto->increment('p_cantidad_entrega',$mercancia['m_cantidad_pedida']);
+            } else {  // Si factura salida anadimos campo producto reservado y desminuir campo producto en almacen
+                $producto->decrement('p_cantidad_almacen', $mercancia['m_cantidad_pedida']);
+                $producto->increment('p_cantidad_reservado',$mercancia['m_cantidad_pedida']);
+            }
+
+        } else {
+            // Si datos incorrectos
+            return response()->json(['error' => 'Datos de factura incorrectos'], 400);
+        }
+    }
+
+
+    private function updateMercancias ($mercancias, $mercanciasViejo, $id, $tipoFactura) {
+        LOG::info('updateMercancias');
+            foreach ($mercancias as $mercancia) {
+                LOG::info($mercancia['m_cantidad_pedida']);
+                if (isset($mercancia['m_id_productos']) && isset($mercancia['m_cantidad_pedida'])) {
+                    LOG::info('updateMercancias');
+                    Mercancia::create([
+                        'm_id_facturas' => $id, // Убедитесь, что $facturaId определен
+                        'm_id_productos' => $mercancia['m_id_productos'],
+                        'm_cantidad_pedida' => $mercancia['m_cantidad_pedida'],
+                        'm_suma_pedida' => $mercancia['m_suma_pedida'],
+                    ]);
+
+                    // Anadimos datos de tabala de producto
+                    $producto = Producto::findOrFail($mercancia['m_id_productos']);
+                    $restosViejos = isset($mercancia['id']) ? $this -> getCantidadPedidaById($mercanciasViejo, $mercancia['id']) : 0;
+
+                    if ($tipoFactura == 0) {  // Si factura entrada anadimos campo producto enviado
+                        $producto->decrement('p_cantidad_entrega',$restosViejos);
+                        $producto->increment('p_cantidad_entrega',$mercancia['m_cantidad_pedida']);
+                    } else {  // Si factura salida anadimos campo producto reservado y desminuir campo producto en almacen
+                        $producto->increment('p_cantidad_almacen', $restosViejos);
+                        $producto->decrement('p_cantidad_reservado',$restosViejos);
+                        $producto->decrement('p_cantidad_almacen', $mercancia['m_cantidad_pedida']);
+                        $producto->increment('p_cantidad_reservado',$mercancia['m_cantidad_pedida']);
+                    }
+
+                } else {
+                    // Si datos incomplited
+                    return response()->json(['error' => 'Datos incomplited'], 400);
+                }
+            }
+
+    }
+
+    // Buscar cantidad por Id
+    private function getCantidadPedidaById($array, $id) {
+
+        $collection = collect($array);
+
+        $item = $collection->firstWhere('id', $id);
+
+        return $item ? $item['m_cantidad_pedida'] : null;
+    }
+
+    // corregir estadisticas con cada nueva factura
+    private function estadisticas ($idFactura, $factura, $mercancias) {
+
+    try {
+        $date = Carbon::now ();
+        $yesterday = Carbon::yesterday ();
+        $id = $date->format('dmY');
+        $estadistica = Estadistica::where('id', $id) -> first();
+
+        $newDay = !$estadistica;  // El dia nueva o no
+
+        if (!$estadistica) { $estadistica = new Estadistica; }   // Si no hay estadistica creamos objeto nuevo
+
+        $estadisticaYesterday = null;   // Buscamos estadistica periodo anterior
+        while (!$estadisticaYesterday && $yesterday->lt($date)) {
+            $idYesterday = $yesterday->format('dmY');
+            $estadisticaYesterday = Estadistica::where('id', $idYesterday)->first();
+            if (!$estadisticaYesterday) {
+                $yesterday->subDay();
+            }
+        }
+
+        $estadisticaNew = new Estadistica ();
+        $estadisticaNew->e_volumen_restos = 0;
+        $estadisticaNew->e_suma_restos = 0;
+        $estadisticaNew->e_suma_ventas_hoy = 0;
+        $estadisticaNew->e_beneficios_hoy = 0;
+
+        if ($factura -> f_tipo) {   // Si es factura venta
+            foreach ($mercancias as $mercancia) {
+                $producto = Producto::findOrFail($mercancia['m_id_productos']);
+                $e_volumen_restos = ($producto->p_ancho*$producto->p_altura*$producto->p_longitud)/1000000000;
+                $e_suma_restos = $mercancia ['m_suma_recogida'];
+                $e_beneficios_hoy = ($producto->p_precio_venta-$producto->p_precio_compra)*$mercancia['m_cantidad_recogida'];
+
+                $estadisticaNew -> e_volumen_restos += $e_volumen_restos;
+                $estadisticaNew -> e_suma_restos += $e_suma_restos;
+                $estadisticaNew -> e_suma_ventas_hoy += $e_suma_restos;
+                $estadisticaNew -> e_beneficios_hoy += $e_beneficios_hoy;
+            }
+
+            $estadistica -> id = $id;
+            $estadistica -> e_fecha = $date;
+            log::info($estadisticaNew);
+            if ($newDay) {
+                $estadistica -> e_volumen_restos = $estadisticaYesterday -> e_volumen_restos - $estadisticaNew -> e_volumen_restos;
+                $estadistica -> e_suma_restos = $estadisticaYesterday ->e_suma_restos - $estadisticaNew -> e_suma_restos;
+                $estadistica -> e_suma_ventas_hoy = $estadisticaNew -> e_suma_ventas_hoy;
+                $estadistica -> e_suma_compras_hoy = 0;
+                $estadistica -> e_beneficios_hoy = $estadisticaNew -> e_beneficios_hoy;
+            } else {
+                $estadistica -> increment ('e_suma_ventas_hoy', $estadisticaNew -> e_suma_ventas_hoy);
+                $estadistica -> decrement ('e_volumen_restos', $estadisticaNew -> e_volumen_restos);
+                $estadistica -> decrement ('e_suma_restos', $estadisticaNew -> e_suma_restos);
+                $estadistica -> increment ('e_beneficios_hoy', $estadisticaNew -> e_beneficios_hoy);
+            }
+
+            if ($date->month == $yesterday->month && $newDay) {
+                $estadistica -> e_suma_ventas_mes = $estadisticaYesterday->e_suma_ventas_mes + $estadisticaNew -> e_suma_ventas_hoy;
+                $estadistica -> e_beneficios_mes = $estadisticaYesterday->e_beneficios_mes + $estadisticaNew -> e_beneficios_hoy;
+                $estadistica -> e_suma_compras_mes = $estadisticaYesterday->e_suma_compras_mes;
+            } else if ($date->month !== $yesterday->month && $newDay) {
+                $estadistica -> e_suma_ventas_mes = $estadisticaNew -> e_suma_ventas_hoy;
+                $estadistica -> e_beneficios_mes = $estadisticaNew -> e_beneficios_hoy;
+                $estadistica -> e_suma_compras_mes = 0;
+            } else  {
+                $estadistica -> increment ('e_suma_ventas_mes',  $estadisticaNew -> e_suma_ventas_hoy);
+                $estadistica -> increment ('e_beneficios_mes', $estadisticaNew -> e_beneficios_hoy);
+            }
+
+            log::info($estadistica);
+            $estadistica ->save();
+
+        } else {   // Si es factura compra
+            foreach ($mercancias as $mercancia) {
+
+                $producto = Producto::findOrFail($mercancia['m_id_productos']);
+                $e_volumen_restos = ($producto->p_ancho*$producto->p_altura*$producto->p_longitud)/1000000000;
+                $e_suma_restos = $mercancia['m_suma_recogida'];
+
+                $estadisticaNew -> e_volumen_restos += $e_volumen_restos;
+                $estadisticaNew -> e_suma_restos += $e_suma_restos;
+                $estadisticaNew -> e_suma_compras_hoy += $e_suma_restos;
+            }
+
+            $estadistica -> id = $id;
+            $estadistica -> e_fecha = $date;
+            if ($newDay) {
+                $estadistica -> e_volumen_restos = $estadisticaYesterday -> e_volumen_restos + $estadisticaNew -> e_volumen_restos;
+                $estadistica -> e_suma_restos = $estadisticaYesterday ->e_suma_restos +  $estadisticaNew -> e_suma_restos;
+                $estadistica -> e_suma_compras_hoy = $estadisticaNew -> e_suma_compras_hoy;
+                $estadistica -> e_suma_ventas_hoy = 0;
+                $estadistica -> e_beneficios_hoy = 0;
+            } else {
+                $estadistica -> increment ('e_suma_compras_hoy', $estadisticaNew -> e_suma_compras_hoy);
+                $estadistica -> increment ('e_volumen_restos', $estadisticaNew -> e_volumen_restos);
+                $estadistica -> increment ('e_suma_restos', $estadisticaNew -> e_suma_restos);
+                $estadistica -> e_beneficios_hoy = $estadistica -> e_beneficios_hoy;
+            }
+
+            if ($date->month == $yesterday->month && $newDay) {
+                $estadistica -> e_suma_compras_mes = $estadisticaYesterday->e_suma_compras_mes + $estadisticaNew -> e_suma_compras_hoy;
+                $estadistica -> e_suma_ventas_mes = $estadisticaYesterday->e_suma_ventas_mes;
+                $estadistica -> e_beneficios_mes = $estadisticaYesterday-> e_beneficios_mes;
+            } else if ($date->month !== $yesterday->month && $newDay) {
+                $estadistica -> e_suma_compras_mes = $estadisticaNew -> e_suma_compras_hoy;
+                $estadistica -> e_suma_ventas_mes = 0;
+                $estadistica -> e_beneficios_mes =0;
+            } else  {
+                $estadistica -> increment ('e_suma_compras_mes',  $estadisticaNew -> e_suma_compras_hoy);
+                $estadistica -> e_suma_ventas_mes = $estadistica -> e_suma_ventas_mes;
+                $estadistica -> e_beneficios_mes = $estadistica -> e_beneficios_mes;
+            }
+            log::info ($estadistica);
+            $estadistica ->save();
+
+        }
+
+    } catch (\Exception $exception) {
+
+        Log::info($exception);
+        return $exception -> getMessage();
+    }
+    }
 }

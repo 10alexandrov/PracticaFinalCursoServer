@@ -126,6 +126,6 @@ class ApiProductoController extends Controller
      */
     public function destroy($producto_id)
     {
-        Producto::findOrFail($producto_id)->delete();
+        Producto::findOrFail($producto_id)->update(['p_activo' => 0]);
     }
 }

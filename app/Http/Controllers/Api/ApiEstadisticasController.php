@@ -9,6 +9,7 @@ use App\Models\Factura;
 use App\Models\Estadistica;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ApiEstadisticasController extends Controller
 {
@@ -24,11 +25,49 @@ class ApiEstadisticasController extends Controller
         $id = $date->format('dmY');
         $estadistica = Estadistica::where('id', $id) -> first();
 
+        if (!$estadistica) {
+            $yesterday = Carbon::yesterday ();
+            $estadisticaYesterday = null;   // Buscamos estadistica periodo anterior
+            while (!$estadisticaYesterday && $yesterday->lt($date)) {
+                $idYesterday = $yesterday->format('dmY');
+                $estadisticaYesterday = Estadistica::where('id', $idYesterday)->first();
+                if (!$estadisticaYesterday) {
+                    $yesterday->subDay();
+                }
+            }
+
+            if ($date->month == $yesterday->month) {
+                $e_suma_compras_mes = $estadisticaYesterday -> e_suma_compras_mes;
+                $e_suma_ventas_mes = $estadisticaYesterday -> e_suma_tasven_mes;
+                $e_beneficios_mes = $estadisticaYesterday -> e_beneficios_mes;
+            } else {
+                $e_suma_compras_mes = 0;
+                $e_suma_ventas_mes = 0;
+                $e_beneficios_mes = 0;
+            }
+
+            $estadistica = Estadistica::create([
+                'id' => $idYesterday,
+                'e_fecha' => $yesterday,
+                'e_compras_hoy' => 0,
+                'e_ventas_hoy' => 0,
+                'e_beneficios_hoy' => 0,
+                'e_suma_compras_mes' => $e_suma_compras_mes,
+                'e_suma_ventas_mes' => $e_suma_ventas_mes,
+                'e_beneficios_mes' => $e_beneficios_mes,
+                'e_suma_restos' => $estadisticaYesterday -> e_suma_restos,
+                'e_volumen_restos' => $estadisticaYesterday -> e_volumen_restos
+            ]);
+
+            $estadistica -> save ();
+        }
+
         $faltaMercancias = DB::table('productos')
         ->select('p_nombre', 'product_id') // Выбираем только столбцы p_nombre и id_product
         ->where('p_cantidad_almacen', '<', 1) // Условие на количество
         ->get(); // Получаем результат
 
+        /*
         if (!$estadistica) {
 
             $estadisticaNew = $this -> obtenerEstadistica ($id, $date);
@@ -40,7 +79,7 @@ class ApiEstadisticasController extends Controller
             } catch (\Exception $e) {
                 return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
             }
-        }
+        } */
 
         $estadistica -> faltaMercancias = $faltaMercancias;
         // Возвращаем найденную запись
@@ -86,16 +125,44 @@ class ApiEstadisticasController extends Controller
             $month = substr($dateString, 2, 2);
             $year = substr($dateString, 4, 4);
             $date = Carbon::createFromDate($year, $month, $day);
+            $limitDay = Carbon::create(2024, 7, 31);
 
-            $estadisticaNew = $this -> obtenerEstadistica ($id, $date);
 
-            try {
-                $estadisticaNew->save();
+                $yesterday = Carbon::createFromDate($year, $month, $day-1);
+                log::info ($yesterday);
+                $estadisticaYesterday = null;   // Buscamos estadistica periodo anterior
+                while (!$estadisticaYesterday && $yesterday -> greaterThan($limitDay)) {
+                    $idYesterday = $yesterday->format('dmY');
+                    $estadisticaYesterday = Estadistica::where('id', $idYesterday)->first();
+                    if (!$estadisticaYesterday) {
+                        $yesterday->subDay();
+                    }
+                }
 
-                return response()->json($estadisticaNew); // Возвращаем созданную запись
-            } catch (\Exception $e) {
-                return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
-            }
+                if ($date->month == $yesterday->month) {
+                    $e_suma_compras_mes = $estadisticaYesterday -> e_suma_compras_mes;
+                    $e_suma_ventas_mes = $estadisticaYesterday -> e_suma_ventas_mes;
+                    $e_beneficios_mes = $estadisticaYesterday -> e_beneficios_mes;
+                } else {
+                    $e_suma_compras_mes = 0;
+                    $e_suma_ventas_mes = 0;
+                    $e_beneficios_mes = 0;
+                }
+
+                $estadistica = Estadistica::create([
+                    'id' => $id,
+                    'e_fecha' => $date,
+                    'e_suma_compras_hoy' => 0,
+                    'e_suma_ventas_hoy' => 0,
+                    'e_beneficios_hoy' => 0,
+                    'e_suma_compras_mes' => $e_suma_compras_mes,
+                    'e_suma_ventas_mes' => $e_suma_ventas_mes,
+                    'e_beneficios_mes' => $e_beneficios_mes,
+                    'e_suma_restos' => $estadisticaYesterday -> e_suma_restos,
+                    'e_volumen_restos' => $estadisticaYesterday -> e_volumen_restos
+                ]);
+
+                $estadistica -> save ();
         }
 
         return response()->json($estadistica);

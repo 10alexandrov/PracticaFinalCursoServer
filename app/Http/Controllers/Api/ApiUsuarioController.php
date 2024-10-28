@@ -120,6 +120,6 @@ class ApiUsuarioController extends Controller
      */
     public function destroy($usuario_id)
     {
-        Usuario::findOrFail($usuario_id)->delete();
+        Usuario::findOrFail($usuario_id)->update(['u_active' => 0]);
     }
 }

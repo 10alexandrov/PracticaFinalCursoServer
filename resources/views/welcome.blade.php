@@ -1,32 +1,63 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <title>Laravel</title>
-
-    </head>
-    <body class="AW-body">
-        <div class="main-wrapper">
-            <div class ="main-aside">
-                @include("include.aside-menu")
-
-            </div>
-        </div>
-        <div class="main-content">
-            <h1> Main page </h1>
-        </div>
-    </body>
-</html>
+@extends('plantilla.plantilla')
+@section('contenido')
 
 <style>
-    .main-content {
-        text-align: center;
-        width: 100%;
-    }
 
-    .AW-body {
-        display:flex;
-    }
+  img, svg {
+    vertical-align: middle;
+  }
+
+  .img, .wrapper {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.AW-center {
+  text-align: center;
+}
+
+.AW-img {
+  width: 30%;
+}
+
+.mobile-menu {
+  display: none;
+}
+
+
+@media screen and (max-width:767px) {
+
+  .sidebar {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: block;
+  }
+
+  .AW-img {
+    width: 40%;
+  }
+
+}
+
 </style>
+
+<div class="d-flex">
+    <div class="sidebar">
+      <app-menu></app-menu>
+    </div>
+    <div class = "info-container AW-center">
+      <div class = "d-flex img m-auto pt-5">
+        <!-- <img src="./assets/1a_logotype.jpg" style="width: 40%;"> -->
+        <img class="AW-img" src="https://omnigena.info/img/logo/1a_logotype.jpg">
+      </div>
+      <h1 class="mt-5 m-auto">BIENVENIDO a ALMACEN</h1>
+
+      <h5 class="mt-4 AW-center">V. 1.2.14.1</h5>
+      <h5 class="mt-1">ALEXAWEB 2024</h5>
+    </div>
+  </div>
+
+  @endsection

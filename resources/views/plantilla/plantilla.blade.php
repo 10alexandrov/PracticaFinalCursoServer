@@ -1,3 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel ="stylesheet" href= "{{asset('storage/css/bootstrap.min.css')}}">
+        <link rel ="stylesheet" href= "{{asset('storage/style.css')}}">
+
+        <title>Laravel</title>
+
+    </head>
+
+    <style>
+
+        * {
+          box-sizing: border-box;
+          }
+
+          .desktop-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+          }
+
+          .AW-logo-mini {
+            width:30%;
+          }
+
+          .wrapper {
+          display: flex;
+          margin: 0 0 8px 0;
+          }
+
+          .cta {
+            display: flex;
+            width: 250px;
+            padding: 0 20px;
+            text-decoration: none;
+            font-family: 'Jost', sans-serif;
+            font-size: 33px;
+            color: white;
+            background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+            transition: 1s;
+            box-shadow: 6px 6px 0 black;
+            transform: skewX(-15deg);
+            justify-content: space-between;
+          }
+
+          .active {
+            color: white;
+            background: linear-gradient(to bottom, #3f31a5, #635acc, #3f31a5);
+            transition: 1s;
+            box-shadow: 6px 6px 0 black;
+            transform: skewX(-15deg);
+            justify-content: space-between;
+          }
+
+
+          .cta:focus {
+           outline: none;
+          }
+
+          .cta:hover {
+            transition: 0.5s;
+            box-shadow: 10px 10px 0 #FBC638;
+          }
+
+          .cta span:nth-child(2) {
+            transition: 0.5s;
+            margin-right: 0px;
+          }
+
+          .cta:hover  span:nth-child(2) {
+            transition: 0.5s;
+            margin-right: 45px;
+          }
+
+          span {
+            transform: skewX(15deg)
+          }
+
+          .desktop-menu-title {
+            width: 190px;
+            text-align: left;
+          }
+
+          span:nth-child(2) {
+            width: 20px;
+            margin-left: 30px;
+            position: relative;
+            top: 12%;
+          }
+
+
+          /**************SVG****************/
+
+          path.one {
+            transition: 0.4s;
+            transform: translateX(-60%);
+          }
+
+          path.two {
+            transition: 0.5s;
+            transform: translateX(-30%);
+          }
+
+          .cta:hover path.three {
+            animation: color_anim 1s infinite 0.2s;
+          }
+
+          .cta:hover path.one {
+            transform: translateX(0%);
+            animation: color_anim 1s infinite 0.6s;
+          }
+
+          .cta:hover path.two {
+            transform: translateX(0%);
+            animation: color_anim 1s infinite 0.4s;
+          }
+
+          #desktop-menu-admin-submenu, #desktop-menu-pedido-submenu {
+            overflow: hidden; /* Скрыть содержимое, которое выходит за пределы */
+            // height: 0; /* Начальная высота */
+            transition: height 0.5s ease-out; /* Анимация для плавного раскрытия */
+          }
+
+          /* SVG animations */
+
+          @keyframes color_anim {
+            0% {
+                fill: white;
+            }
+            50% {
+                fill: #FBC638;
+            }
+            100% {
+                fill: white;
+            }
+          }
+
+        </style>
+
+
+
 
 <div class="desktop-menu">
     <div class="d-flex pt-2 pb-2">
@@ -52,8 +198,8 @@
     </div>
 
 
-    <div class="wrapper" *ngIf="role !== 'vendedor' && role !== 'cliente'" >
-      <a class="cta" id = "desktop-menu-admin" href='/almacen' [class.active]="isActive('/almacen')">
+    <div class="wrapper">
+      <a class="cta" id = "desktop-menu-admin" href='/almacen'>
         <span class = "desktop-menu-title">Almacen</span>
         <span>
             <svg width="40px" height="40px" viewBox="0 10 66 43" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -67,8 +213,8 @@
       </a>
     </div>
 
-    <div class="wrapper" *ngIf="role !== 'receptor' && role !== 'recogedor'">
-      <a class="cta" id = "desktop-menu-admin" href='/estadistica' [class.active]="isActive('/estadistica')">
+    <div class="wrapper">
+      <a class="cta" id = "desktop-menu-admin" href='/estadistica'>
         <span class = "desktop-menu-title">Análisis</span>
         <span>
             <svg width="40px" height="40px" viewBox="0 10 66 43" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -85,7 +231,7 @@
 
 
         <div class="wrapper mt-5">
-          <button class="cta" id="desktop-menu" (click)="logout()">
+          <button class="cta" id="desktop-menu">
             <span class = "desktop-menu-title">Logout</span>
             <span>
                 <svg width="40px" height="40px" viewBox="0 10 66 43" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -99,3 +245,6 @@
           </button>
         </div>
   </div>
+
+  @yield ('contenido');
+

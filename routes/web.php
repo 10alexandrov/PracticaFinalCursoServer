@@ -38,3 +38,7 @@ Route::resource('/pedido',FacturaController::class);
 Route::post('/pedido/store', [FacturaController::class, 'store']);
 Route::post('/pedido/find', [FacturaController::class, 'find']) -> name("pedido.find");
 
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

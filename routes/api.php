@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ApiMercanciaController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ApiEstadisticasController;
 use App\Http\Controllers\Api\ApiLugarController;
+use App\Http\Controllers\Api\ApiPruebaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +54,8 @@ Route::post('/usuarios', [ApiUsuarioController::class, 'store']);
 // Route::resource('/mercancias', ApiMercanciaController::class)-> names("mercancis");
 // Route::resource('/categorias', ApiCategoriaController::class)-> names("categorias");
 // Route::resource('/estadistica', ApiEstadisticasController::class)-> names("estadistica");
+
+Route::post('/prueba', [ApiPruebaController::class, 'index']);
 
 
 

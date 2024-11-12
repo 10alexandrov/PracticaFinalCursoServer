@@ -37,20 +37,25 @@ class ApiEstadisticasController extends Controller
             }
 
             if ($date->month == $yesterday->month) {
+                log::info('prim');
                 $e_suma_compras_mes = $estadisticaYesterday -> e_suma_compras_mes;
-                $e_suma_ventas_mes = $estadisticaYesterday -> e_suma_tasven_mes;
+                $e_suma_ventas_mes = $estadisticaYesterday -> e_suma_ventas_mes;
                 $e_beneficios_mes = $estadisticaYesterday -> e_beneficios_mes;
             } else {
+                log::info('seg');
                 $e_suma_compras_mes = 0;
                 $e_suma_ventas_mes = 0;
                 $e_beneficios_mes = 0;
             }
 
+            log::info($e_suma_ventas_mes);
+            log::info($estadisticaYesterday);
+
             $estadistica = Estadistica::create([
-                'id' => $idYesterday,
-                'e_fecha' => $yesterday,
-                'e_compras_hoy' => 0,
-                'e_ventas_hoy' => 0,
+                'id' => $id,
+                'e_fecha' => $date,
+                'e_suma_compras_hoy' => 0,
+                'e_suma_ventas_hoy' => 0,
                 'e_beneficios_hoy' => 0,
                 'e_suma_compras_mes' => $e_suma_compras_mes,
                 'e_suma_ventas_mes' => $e_suma_ventas_mes,
@@ -59,6 +64,7 @@ class ApiEstadisticasController extends Controller
                 'e_volumen_restos' => $estadisticaYesterday -> e_volumen_restos
             ]);
 
+            log::info($estadistica);
             $estadistica -> save ();
         }
 

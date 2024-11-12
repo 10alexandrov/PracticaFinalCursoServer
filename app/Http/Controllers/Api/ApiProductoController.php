@@ -18,7 +18,7 @@ class ApiProductoController extends Controller
     public function index(Request $request)
     {
         $productos = Producto::all();
-        Log::info('Authorization header: ' . $request->header('Authorization'));
+
         Log::info('Index: ' . $productos);
 
 
@@ -38,7 +38,6 @@ class ApiProductoController extends Controller
     public function activos(Request $request)
     {
         Log::info('Prueba: ');
-        Log::info('Authorization header: ' . $request->header('Authorization'));
         $productos = Producto::where('p_activo', true) -> get();
 
         $productos -> map(function($producto) {

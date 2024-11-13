@@ -42,6 +42,10 @@ class Usuario extends Authenticatable implements JWTSubject
         return $this -> u_password;
      }
 
+     public function username() {
+        return 'u_login';
+    }
+
      public function facturasClient(){
         return $this->hasMany(Factura::class, 'usuario_id', 'f_id_cliente');
     }

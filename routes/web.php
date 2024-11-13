@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\FacturaController;
+use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,9 +19,20 @@ use App\Http\Controllers\FacturaController;
 |
 */
 
+// Главная страница с перенаправлением
 Route::get('/', function () {
-    return view('welcome');
-}) -> name("home");
+    $error = session()->get('error');
+    if (Auth::check()) {
+        return redirect()->route('home')->with('error', $error);
+    }
+    return redirect()->route('login'); // Явный редирект на именованный маршрут 'login'
+})->name('main'); // Указываем имя
+
+Auth::routes(); // Маршруты для аутентификации
+
+// Home маршрут с использованием контроллера
+Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth');
+
 Route::get('/recepcion', function () {
     return view('recepcion');
 }) -> name("reception"); ;
@@ -38,7 +52,3 @@ Route::resource('/pedido',FacturaController::class);
 Route::post('/pedido/store', [FacturaController::class, 'store']);
 Route::post('/pedido/find', [FacturaController::class, 'find']) -> name("pedido.find");
 
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

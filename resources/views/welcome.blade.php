@@ -44,10 +44,7 @@
 
 </style>
 
-<div class="d-flex">
-    <div class="sidebar">
-      <app-menu></app-menu>
-    </div>
+
     <div class = "info-container AW-center">
       <div class = "d-flex img m-auto pt-5">
         <!-- <img src="./assets/1a_logotype.jpg" style="width: 40%;"> -->
@@ -58,6 +55,6 @@
       <h5 class="mt-4 AW-center">V. 1.2.14.1</h5>
       <h5 class="mt-1">ALEXAWEB 2024</h5>
     </div>
-  </div>
+
 
   @endsection

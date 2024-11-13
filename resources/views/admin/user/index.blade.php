@@ -1,55 +1,58 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('plantilla.plantilla')
+@section('contenido')
 
-        <title>Laravel</title>
-
-    </head>
-    <body class="AW-body">
-        <div class="main-wrapper">
-            <div class ="main-aside">
-                @include("include.aside-menu")
-
+        <div class="info-container AW-center">
+            <div class="d-flex justify-content-between">
+                <h1> Usuarios </h1>
+                <a  href="{{ route('usuarios.create')}}">
+                    <button class='btn btn-primary mt-2 me-2'>Crear nuevo usuario </button>
+                </a>
             </div>
-        </div>
-        <div class="main-content">
-            <h1> Usuarios </h1>
-            <div class="table_container">
-                <table>
-                    <tr>
-                        <th> Usuario </th>
-                        <th> Login </th>
-                        <th> Role </th>
-                        <th> Editar </th>
-                        <th> Borrar </th>
-                    </tr>
+            <div class=" p-2">
+                <table class="table table-primary table-bordered">
+                    <thead>
+                        <tr>
+                            <th> Usuario </th>
+                            <th> Login </th>
+                            <th> Role </th>
+                            <th> Active </th>
+                            <th> Editar </th>
+                            <th> Borrar </th>
+                        </tr>
+                    </thead>
+                    <tbody class='table-group-divider'>
                     @foreach ($usuarios as $usuario)
                         <tr>
                             <td> {{$usuario->u_nombre}} </td>
                             <td> {{$usuario->u_login}} </td>
                             <td> {{$usuario->u_role}} </td>
-                            <td> <a href='{{ route('admin.usuarios.edit', $usuario->usuario_id)}}'>Editar </a></td>
                             <td>
-                                <form action="{{ route('admin.usuarios.destroy', $usuario->usuario_id)}}" method="POST">
+                                @if ($usuario->u_active == 1)
+                                    <p class="text-success fw-semibold">Activo </p>
+                                @elseif ($usuario->u_active == 0)
+                                    <p class="text-danger fw-semibold">Inactivo</p>
+                                @endif
+                            </td>
+                            <td> <a href='{{ route('usuarios.edit', $usuario->usuario_id)}}'>
+                                    <button class="btn btn-warning">Editar</button>
+                                </a>
+                            </td>
+                            <td>
+                                <form action="{{ route('usuarios.destroy', $usuario->usuario_id)}}" method="POST">
                                     @method('DELETE')
                                     @csrf
-                                    <button>Borrar </button>
+                                    <button class="btn btn-danger">Borrar </button>
                                 </form>
                             </td>
                         </tr>
 
                     @endforeach
+                    </tbody>
                 </table>
             </div>
-            <a  href="{{ route('admin.usuarios.create')}}">
-                <button class='m-100'>Crear nuevo usuario </button>
-           </a>
         </div>
-    </body>
-</html>
 
+@endsection
 <style>
 
     .AW-body {
@@ -74,6 +77,7 @@
 
     td {
         font-weight: 400;
+        height:30px;
     }
 
     td a{

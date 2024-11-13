@@ -52,7 +52,7 @@
       </div>
       <h1 class="mt-5 m-auto">BIENVENIDO a ALMACEN</h1>
 
-      <h5 class="mt-4 AW-center">V. 1.2.14.3</h5>
+      <h5 class="mt-4 AW-center">V. 1.2.14.4</h5>
       <h5 class="mt-1">ALEXAWEB 2024</h5>
     </div>
 

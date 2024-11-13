@@ -43,7 +43,7 @@ Route::get('/recogida', function () {
     return view('recogida');
 }) -> name("recogida");;
 
-Route::resource('/admin/user',UsuarioController::class) -> names("admin.usuarios");
+Route::resource('/usuarios',UsuarioController::class) -> names("usuarios");
 Route::resource('/admin/product',ProductoController::class) -> names("admin.productos");
 
 Route::post('/admin/product/find', [ProductoController::class, 'find']) -> name("admin.productos.find");

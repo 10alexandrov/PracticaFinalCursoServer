@@ -157,7 +157,7 @@
         </div>
 
         <div class="wrapper">
-            <a class="cta" id = "desktop-menu-admin" href='/usuarios'>
+            <a class="cta" id = "desktop-menu-admin" href='{{ route('usuarios.index') }}'>
             <span class = "desktop-menu-title">Usuarios</span>
             <span>
                 <svg width="40px" height="40px" viewBox="0 10 66 43" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">

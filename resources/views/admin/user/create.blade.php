@@ -1,29 +1,18 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('plantilla.plantilla')
+@section('contenido')
 
-        <title>Laravel</title>
-
-    </head>
-
-
-    <body class="AW-body">
-        <div class="main-wrapper">
-            <div class ="main-aside">
-                @include("include.aside-menu")
-
+        <div class="info-container AW-center">
+            <div class="d-flex justify-content-between">
+                <h1> Crear nuevo usuario</h1>
+                <a  href="{{ route('usuarios.index')}}">
+                    <button class='btn btn-primary mt-2 me-2'>Volver </button>
+                </a>
             </div>
-        </div>
-        <div class="main-content">
-            <h1> Crear nuevo usuario</h1>
-
             <div class="form">
-                <div class="container mt-5">
+                <div class="container mt-2">
                     <div class="table_container">
 
-                        <form action="{{ route('admin.usuarios.store') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('usuarios.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="form-group m-20">
                                 <label for="u_nombre">Nombre usuario</label>
@@ -41,8 +30,13 @@
                             </div>
 
                             <div class="form-group m-20">
+                                <label for="u_password">Reepite password</label>
+                                <input type="text" class="form-control" id="u_password" name="u_password" value="{{ old('u_password') }}" required>
+                            </div>
+
+                            <div class="form-group m-20 ">
                                 <label for="u_role">Role</label>
-                                <select name="u_role" required>
+                                <select name="u_role" required class="w-100">
                                     <option  value="recogedor">Recogedor</option>
                                     <option  value="admin">Admin</option>
                                     <option  value="manager">Manager</option>
@@ -52,6 +46,20 @@
                                 </select>
                             </div>
 
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" name ="u_active" type="radio" value=1 id="activeTrue">
+                                <label class="form-check-label form-label-AW" for="activeTrue">
+                                   Usuario active
+                                 </label>
+                             </div>
+
+                             <div class="form-check form-check-inline">
+                                 <input class="form-check-input" type="radio" name ="u_active" value=0 id="activeFalse">
+                                 <label class="form-check-label form-label-AW" for="activeFalse">
+                                    Usuario inactive
+                                  </label>
+                             </div>
+
                              <button class='m-20 btn-new'>Crear nuevo usuario </button>
                          </form>
                     </div>
@@ -59,9 +67,6 @@
             </div>
         </div>
 
-
-
-</body>
 
 <style>
 
@@ -89,10 +94,16 @@
         display: flex;
         justify-content: center;
         align-items: baseline;
+        padding: 10px;
+        background-color: #ccc;
     }
 
     .m-20 {
-    margin-top: 20px;
-}
+    margin-top: 15px;
+    }
+    label {
+        font-weight:600;
+    }
+
 </style>
-</html>
+@endsection

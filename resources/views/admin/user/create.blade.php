@@ -1,6 +1,7 @@
 @extends('plantilla.plantilla')
 @section('contenido')
 
+
         <div class="info-container AW-center">
             <div class="d-flex justify-content-between">
                 <h1> Crear nuevo usuario</h1>
@@ -12,55 +13,119 @@
                 <div class="container mt-2">
                     <div class="table_container">
 
-                        <form action="{{ route('usuarios.store') }}" method="POST" enctype="multipart/form-data">
+                        <form class="w-85" action="{{ route('usuarios.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
-                            <div class="form-group m-20">
-                                <label for="u_nombre">Nombre usuario</label>
-                                <input type="text" class="form-control" id="u_nombre" name="u_nombre" value="{{ old('u_nombre') }}" required>
+
+
+                            <div class="row m-20">
+                                <div class="form-group col-12 col-md-7">
+                                    <label for="u_nombre">Nombre usuario</label>
+                                    <input type="text" class="form-control" id="u_nombre" name="u_nombre" value="{{ old('u_nombre') }}">
+                                </div>
+                                <div class="form-group col-12 col-md-4 p-mobile">
+                                    @if ($errors->has('u_nombre'))
+                                        <div class="text-danger">
+                                            {{ $errors->first('u_nombre')}}
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
 
-                            <div class="form-group m-20">
-                                <label for="u_login">Login</label>
-                                <input type="text" class="form-control" id="u_login" name="u_login" value="{{ old('u_login') }}" required>
+
+                            <div class="row m-20">
+                                <div class="form-group col-12 col-md-7">
+                                    <label for="u_login">Login</label>
+                                    <input type="text" class="form-control" id="u_login" name="u_login" value="{{ old('u_login') }}">
+                                </div>
+                                <div class="form-group col-12 col-md-4 p-mobile">
+                                    @if ($errors->has('u_login'))
+                                        <div class="text-danger">
+                                            {{ $errors->first('u_login')}}
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
 
-                            <div class="form-group m-20">
-                                <label for="u_password">Password</label>
-                                <input type="text" class="form-control" id="u_password" name="u_password" value="{{ old('u_password') }}" required>
+
+
+                            <div class="row m-20">
+                                <div class="form-group col-12 col-md-7">
+                                    <label for="u_password">Password</label>
+                                    <input type="password" class="form-control" id="u_password" name="u_password">
+                                </div>
+                                <div class="form-group col-12 col-md-4 p-mobile">
+                                    @if ($errors->has('u_password'))
+                                        <div class="text-danger">
+                                            {{ $errors->first('u_password')}}
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
 
-                            <div class="form-group m-20">
-                                <label for="u_password">Reepite password</label>
-                                <input type="text" class="form-control" id="u_password" name="u_password" value="{{ old('u_password') }}" required>
+                            <div class="row m-20">
+                                <div class="form-group col-12 col-md-7">
+                                    <label for="u_password2">Repite password</label>
+                                    <input type="password" class="form-control" id="u_password2" name="u_password2">
+                                </div>
+                                <div class="form-group col-12 col-md-4 p-mobile">
+                                    @if ($errors->has('u_password2'))
+                                        <div class="text-danger">
+                                            {{ $errors->first('u_password2')}}
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
 
-                            <div class="form-group m-20 ">
-                                <label for="u_role">Role</label>
-                                <select name="u_role" required class="w-100">
-                                    <option  value="recogedor">Recogedor</option>
-                                    <option  value="admin">Admin</option>
-                                    <option  value="manager">Manager</option>
-                                    <option  value="cliente">Cliente</option>
-                                    <option  value="vendedor">Vendedor</option>
-                                    <option  value="receptor">Receptor</option>
-                                </select>
+                            <div class="row m-20">
+                                <div class="form-group col-12 col-md-7">
+                                   <label for="u_role">Role</label>
+                                   <select name="u_role" class="w-100">
+                                       <option value=""> == Elije un role == </option>
+                                       <option  value="recogedor">Recogedor</option>
+                                       <option  value="admin">Admin</option>
+                                        <option  value="manager">Manager</option>
+                                        <option  value="cliente">Cliente</option>
+                                       <option  value="vendedor">Vendedor</option>
+                                        <option  value="receptor">Receptor</option>
+                                    </select>
+                                 </div>
+                                 <div class="form-group col-12 col-md-4 p-mobile">
+                                    @if ($errors->has('u_role'))
+                                        <div class="text-danger">
+                                            {{ $errors->first('u_role')}}
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
 
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" name ="u_active" type="radio" value=1 id="activeTrue">
-                                <label class="form-check-label form-label-AW" for="activeTrue">
-                                   Usuario active
-                                 </label>
-                             </div>
 
-                             <div class="form-check form-check-inline">
-                                 <input class="form-check-input" type="radio" name ="u_active" value=0 id="activeFalse">
-                                 <label class="form-check-label form-label-AW" for="activeFalse">
-                                    Usuario inactive
-                                  </label>
-                             </div>
+                            <div class="row m-20">
+                                <div class="form-check col-12 col-md-3">
+                                    <input class="form-check-input" name ="u_active" type="radio" value=1 id="activeTrue">
+                                    <label class="form-check-label form-label-AW" for="activeTrue">
+                                    Usuario active
+                                    </label>
+                                </div>
 
-                             <button class='m-20 btn-new'>Crear nuevo usuario </button>
+                                <div class="form-check col-12 col-md-4">
+                                    <input class="form-check-input" type="radio" name ="u_active" value=0 id="activeFalse">
+                                    <label class="form-check-label form-label-AW" for="activeFalse">
+                                        Usuario inactive
+                                    </label>
+                                </div>
+                                <div class="form-group col-12 col-md-4">
+                                    @if ($errors->has('u_active'))
+                                        <div class="text-danger">
+                                            {{ $errors->first('u_active')}}
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+
+
+
+                             <button class='m-20 btn btn-primary'>Crear nuevo usuario </button>
                          </form>
                     </div>
                 </div>
@@ -99,10 +164,19 @@
     }
 
     .m-20 {
-    margin-top: 15px;
+    margin-top: 10px;
     }
     label {
         font-weight:600;
+    }
+
+    .w-85 {
+        width:85%;
+    }
+
+    .p-mobile {
+        padding-top: 27px;
+        padding-left: 10px;
     }
 
 </style>

@@ -1,3 +1,7 @@
+@extends('plantilla.plantilla')
+@section('contenido')
+
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -7,46 +11,47 @@
         <title>Product</title>
 
     </head>
-    <body class="AW-body">
-        <div class="main-wrapper">
-            <div class ="main-aside">
-                @include("include.aside-menu")
-
-            </div>
+    <div class="info-container AW-center">
+        <div class="d-flex justify-content-between pb-2">
+            <h1 class="pt-1"> Productos </h1>
+            <a  href="{{ route('product.create')}}">
+                <button class='btn btn-primary mt-2 me-2'>Crear nuevo producto </button>
+            </a>
         </div>
-        <div class="main-content">
-            <h1> Productos </h1>
-            <div class='find_container'>
-                <form action="{{ route('admin.productos.find')}}" method="POST">
-                    @csrf
-                    <div class="d-flex" style="margin-left: 100px;">
-                        <div class="form-group m-20">
-                            <label for="find_categoria">Categoria</label>
-                            <select name="find_categoria">
-                                <option value="">Elije categoria</option>
-                                <option  value="1">Bebidas</option>
-                                <option  value="2">Cereales</option>
-                                <option  value="3">Enlatada</option>
-                                <option  value="4">Pasteleria</option>
-                                <option  value="5">Alcohol</option>
-                                <option  value="6">Snack</option>
-                            </select>
-                        </div>
-                        <div class="form-group m-20">
-                            <label for="p_nombre">Buscar por nombre</label>
-                            <input type="text" class="form-control" id="partial" name="partial">
-                            <input type="hidden" name="rute" value="admin">
-                        </div>
-                        <button>Filtrar </button>
+        <div class='find-container pt-2 mb-1'>
+            <form action="{{ route('product.find')}}" method="POST">
+                @csrf
+                <div class="row pb-2">
+                    <div class="form-group col-12 col-sm-10 col-md-5 align-self-center mt-1 row mb-1">
+                       <label for="find_categoria" class="col-4 col-md-5" >Categoria</label>
+                        <select class="col-8 col-md-7" name="find_categoria">
+                            <option value="">Elije categoria</option>
+                            <option  value="1">Bebidas</option>
+                            <option  value="2">Cereales</option>
+                            <option  value="3">Enlatada</option>
+                            <option  value="4">Pasteleria</option>
+                            <option  value="5">Alcohol</option>
+                            <option  value="6">Snack</option>
+                        </select>
                     </div>
-                </form>
-            </div>
+
+                    <div class="form-group col-12 col-sm-10 col-md-4 row pb-1">
+                        <label class ="col-4 pt-1 align-self-center" for="p_nombre">Buscar</label>
+                        <input type="text" class="col-8" id="partial" name="partial">
+                        <input type="hidden" name="rute" value="admin">
+                    </div>
+                    <div class="col-12 col-sm-2 col-md-2 row">
+                        <button class=" btn btn-dark w-75 m-auto">Filtrar </button>
+                    </div>
+                </div>
+            </form>
+        </div>
             <div class="table_container">
-                <table>
+                <table class="table table-bordered table-primary">
                     <tr>
                         <th> Producto </th>
-                        <th> Categoria </th>
-                        <th> Cantidad </th>
+                        <th class="tablet-hidden"> Categoria </th>
+                        <th class="mobile-hidden"> Actividad </th>
                         <th> Mostrar </th>
                         <th> Editar </th>
                         <th> Borrar </th>
@@ -54,15 +59,26 @@
                     @foreach ($productos as $producto)
                         <tr>
                             <td> {{$producto->p_nombre}} </td>
-                            <td> {{$producto->p_categoria}} </td>
-                            <td> {{$producto->p_cantidad_almacen}} </td>
-                            <td> <a href='{{ route('admin.productos.show', $producto->product_id)}}'>Mostrar </a></td>
-                            <td> <a href='{{ route('admin.productos.edit', $producto->product_id)}}'>Editar </a></td>
+                            <td class="tablet-hidden"> {{$producto->p_categoria}} </td>
+                            <td class="mobile-hidden">
+                                @if ($producto->p_activo)
+                                    <p class="text-success"> Activo </p>
+                                @else
+                                    <p class="text-danger">Inactivo </p>
+                                @endif
+                            </td>
+                            <td> <a href='{{ route('product.show', $producto->product_id)}}'>
+                                    <button class="btn btn-primary" id="btn-text">Mostrar</button>
+                                </a>
+                            </td>
+                            <td> <a href='{{ route('product.edit', $producto->product_id)}}'>
+                                    <button class="btn btn-warning" id="btn-text"> Editar </button>
+                                </a></td>
                             <td>
-                                <form action="{{ route('admin.productos.destroy', $producto->product_id)}}" method="POST">
+                                <form action="{{ route('product.destroy', $producto->product_id)}}" method="POST">
                                     @method('DELETE')
                                     @csrf
-                                    <button>Borrar </button>
+                                    <button class="btn btn-danger">Desactivar </button>
                                 </form>
                             </td>
                         </tr>
@@ -70,12 +86,11 @@
                     @endforeach
                 </table>
             </div>
-            <a  href="{{ route('admin.productos.create')}}">
-                <button class='m-100'>Crear nuevo producto </button>
-           </a>
         </div>
-    </body>
+    </div>
 </html>
+
+@endsection
 
 <style>
 
@@ -86,6 +101,10 @@
     .main-content {
         text-align: center;
         width:100%;
+    }
+
+    .find-container {
+        background-color: #bbb;
     }
 
     .table_container {

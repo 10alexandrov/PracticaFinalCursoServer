@@ -5,7 +5,7 @@
         <div class="info-container AW-center">
             <div class="d-flex justify-content-between">
                 <h1> Crear nuevo usuario</h1>
-                <a  href="{{ route('usuarios.index')}}">
+                <a  href="{{ route('users.index')}}">
                     <button class='btn btn-primary mt-2 me-2'>Volver </button>
                 </a>
             </div>
@@ -13,7 +13,7 @@
                 <div class="container mt-2">
                     <div class="table_container">
 
-                        <form class="w-85" action="{{ route('usuarios.store') }}" method="POST" enctype="multipart/form-data">
+                        <form class="w-85" action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
 

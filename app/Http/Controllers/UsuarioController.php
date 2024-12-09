@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
@@ -62,6 +63,10 @@ class UsuarioController extends Controller
                 'u_active.required' => 'Este campo es obligatorio'
             ]
         );
+
+        if (isset ($request->u_password)) {
+            $data['u_password'] = Hash::make($request->u_password);
+        }
 
         Usuario::create($data);
 
@@ -125,10 +130,14 @@ class UsuarioController extends Controller
             ]
         );
 
+        if (isset ($request->u_password)) {
+            $data['u_password'] = Hash::make($request->u_password);
+        }
+
         Usuario::findOrFail($id) ->update($data);
 
         $usuarios=Usuario::get();
-        return view ('usuarios.index', compact('usuarios'));
+        return view ('admin.user.index', compact('usuarios'));
     }
 
     /**
@@ -139,7 +148,9 @@ class UsuarioController extends Controller
      */
     public function destroy($usuario_id)
     {
-        Usuario::findOrFail($usuario_id)->delete();
+        $usuarioParaDesactivar = Usuario::findOrFail($usuario_id);
+        $usuarioParaDesactivar -> u_active = 0;
+        $usuarioParaDesactivar -> update ();
         $usuarios=Usuario::get();
         return view ('admin.user.index', compact('usuarios'));
     }

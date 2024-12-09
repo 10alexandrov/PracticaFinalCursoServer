@@ -4,7 +4,7 @@
         <div class="info-container AW-center">
             <div class="d-flex justify-content-between">
                 <h1> Usuarios </h1>
-                <a  href="{{ route('usuarios.create')}}">
+                <a  href="{{ route('users.create')}}">
                     <button class='btn btn-primary mt-2 me-2'>Crear nuevo usuario </button>
                 </a>
             </div>
@@ -33,15 +33,15 @@
                                     <p class="text-danger fw-semibold">Inactivo</p>
                                 @endif
                             </td>
-                            <td> <a href='{{ route('usuarios.edit', $usuario->usuario_id)}}'>
-                                    <button class="btn btn-warning">Editar</button>
+                            <td> <a href='{{ route('users.edit', $usuario->usuario_id)}}'>
+                                    <button class="btn btn-warning" id="btn-text">Editar</button>
                                 </a>
                             </td>
                             <td>
-                                <form action="{{ route('usuarios.destroy', $usuario->usuario_id)}}" method="POST">
+                                <form action="{{ route('users.destroy', $usuario->usuario_id)}}" method="POST">
                                     @method('DELETE')
                                     @csrf
-                                    <button class="btn btn-danger">Borrar </button>
+                                    <button class="btn btn-danger" id="btn-text">Desactivar </button>
                                 </form>
                             </td>
                         </tr>

@@ -61,7 +61,7 @@ class ApiEstadisticaController extends Controller
     public function show($id)
     {
 
-        $estadistica = Estadistica::where(id,$id)->first();
+        $estadistica = Estadistica::where('id' ,$id)->first();
         // Log::info('Authorization header: ' . $request->header('Authorization'));
 
         if ($estadistica) {

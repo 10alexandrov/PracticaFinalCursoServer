@@ -156,18 +156,8 @@ button:hover{
                                 </div>
                             </div>
 
-                            <div class="form-check d-flex w-50">
-                                <div class="m-auto">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-
-                                    <label class="form-check-label" for="remember">
-                                        {{ __('Remember Me') }}
-                                    </label>
-                                </div>
-                            </div>
-
                             <div class="row mb-0">
-                                <div class="col-md-8 offset-md-4">
+                                <div class="col-md-8 offset-md-2">
                                     <button type="submit">
                                         {{ __('Login') }}
                                     </button>

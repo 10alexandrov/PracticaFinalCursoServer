@@ -18,8 +18,9 @@ return [
     'paths' => ['api/*'],
 
     'allowed_methods' => ['*'],
+    
+    'allowed_origins' => ['http://localhost:4200', 'http://almacen', 'https://almacen', 'http://localhost', 'https://localhost', 'http://192.168.*.*', 'https://192.168.*.*' ],
 
-    'allowed_origins' => ['http://localhost:4200'],
 
     'allowed_origins_patterns' => [],
 

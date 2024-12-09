@@ -1,3 +1,8 @@
+
+@extends('plantilla.plantilla')
+@section('contenido')
+
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -9,111 +14,199 @@
     </head>
 
 
-    <body class="AW-body">
-        <div class="main-wrapper">
-            <div class ="main-aside">
-                @include("include.aside-menu")
-
+<body>
+<form class="info-container AW-center" action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+    <div>
+        <div class="row mt-3 mb-3">
+            <h1 class="col-12 col-sm-7 col-md-7 col-lg-8">Crear nuevo Producto</h1>
+            <div class="col-12 col-sm-5 col-md-5 col-lg-4 d-flex justify-content-between">
+              <div class="mt-2" >
+                <button type="submit" class="btn btn-primary btn-AW">Crear</button>
+              </div>
+              <div  class="ms-5 mt-2" >
+                <a href="{{route('product.index')}}">
+                    <button type="button" class="btn btn-info btn-AW">Volver</button>
+                </a>
+              </div>
             </div>
         </div>
-        <div class="main-content">
-            <h1> Crear nuevo Producto</h1>
 
-            <div class="form">
-                <div class="container mt-5">
-                    <div class="table_container">
-
-                        <form action="{{ route('admin.productos.store') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="form-group m-20">
-                                <label for="p_nombre">Nombre producto</label>
-                                <input type="text" class="form-control" id="p_nombre" name="p_nombre" value="{{ old('p_nombre') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_categoria">Categoria</label>
-                                <select name="p_categoria" required>
-                                    <option  value="1">Bebidas</option>
-                                    <option  value="2">Cereales</option>
-                                    <option  value="3">Enlatada</option>
-                                    <option  value="4">Pasteleria</option>
-                                    <option  value="5">Alcohol</option>
-                                    <option  value="6">Snack</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_ancho">Anchura del producto</label>
-                                <input type="number" class="form-control" id="p_ancho" name="p_ancho" value="{{ old('p_ancho') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_longitud">Longitud del producto</label>
-                                <input type="number" class="form-control" id="p_longitud" name="p_longitud" value="{{ old('p_longitud') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_altura">Altura del producto</label>
-                                <input type="number" class="form-control" id="p_altura" name="p_altura" value="{{ old('p_altura') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_peso">Peso del producto</label>
-                                <input type="number" class="form-control" id="p_peso" name="p_peso" value="{{ old('p_peso') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_cantidad_almacen">Cantidad en almacen</label>
-                                <input type="number" class="form-control" id="p_cantidad_almacen" name="p_cantidad_almacen" value="{{ old('p_cantidad_almacen') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_cantidad_entrega">Cantidad en entrega</label>
-                                <input type="number" class="form-control" id="p_cantidad_entregan" name="p_cantidad_entrega" value="{{ old('p_cantidad_entrega') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_cantidad_reservado">Cantidad reservado</label>
-                                <input type="number" class="form-control" id="p_cantidad_reservado" name="p_cantidad_reservado" value="{{ old('p_cantidad_reservado') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_cantidad_enviado">Cantidad enviado</label>
-                                <input type="number" class="form-control" id="p_cantidad_enviado" name="p_cantidad_enviado" value="{{ old('p_cantidad_enviado') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_precio_compra">Precio de compra</label>
-                                <input type="number" class="form-control" id="p_precio_compra" name="p_precio_compra" value="{{ old('p_precio_compra') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_precio_venta">Precio de venta</label>
-                                <input type="number" class="form-control" id="p_precio_venta" name="p_precio_venta" value="{{ old('p_precio_venta') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="p_codigo">Codigo de barra</label>
-                                <input type="text" class="form-control" id="p_codigo" name="p_codigo" value="{{ old('p_codigo') }}" required>
-                            </div>
-
-                            <div class="form-group m-20">
-                                <label for="image">Subir Imagen:</label>
-                                <input type="file" id="image" name="image" accept="image/*" required onchange="previewImage(event)">
-                                <br><br>
-                                <img id="imagePreview" src="#" alt="Image Preview" style="display:none; max-width: 200px; max-height: 200px;">
-                            </div>
-
-                             <button class='m-20 btn-new'>Crear nuevo poducto </button>
-                         </form>
-                    </div>
+<div class="form">
+    <div class="row">
+      <div class="col-12 col-sm-6 col-md-4 desctop-color pb-2">
+        <label for="nombre" class="form-label-AW">Nombre producto</label>
+        <div>
+          <input type="text" name="p_nombre" placeholder="Nombre..." class="form-control col-md-6" value="{{ old('p_nombre') }}">
+            @if ($errors->has('p_nombre'))
+                <div class="text-danger">
+                    {{ $errors->first('p_nombre')}}
                 </div>
-            </div>
+            @endif
         </div>
+      </div>
+
+
+      <!-- Categoria select -->
+      <div class="col-12 col-sm-6 col-md-4 desctop-color pb-2">
+        <label for="p_categoria" class="form-label-AW">Categoria</label>
+        <div>
+          <select name="p_categoria" class="form-control col-md-6">
+            <option value="">-- Elije una categoria --</option>
+            <option  value="1" {{ old('p_categoria') == 1 ? 'selected' : '' }}>Bebidas</option>
+            <option  value="2" {{ old('p_categoria') == 2 ? 'selected' : '' }}>Cereales</option>
+            <option  value="3" {{ old('p_categoria') == 3 ? 'selected' : '' }}>Enlatada</option>
+            <option  value="4" {{ old('p_categoria') == 4 ? 'selected' : '' }}>Pasteleria</option>
+            <option  value="5" {{ old('p_categoria') == 5 ? 'selected' : '' }}>Alcohol</option>
+            <option  value="6" {{ old('p_categoria') == 6 ? 'selected' : '' }}>Snack</option>
+          </select>
+          @if ($errors->has('p_categoria'))
+            <div class="text-danger">
+                {{ $errors->first('p_categoria')}}
+            </div>
+        @endif
+        </div>
+      </div>
+
+      <!--  Activar/desactivar producto -->
+      <div class="col-12 col-sm-12 col-md-4 pt-4 mobile-color pb-2">
+        <div class="form-check form-check-inline">
+          <input type="hidden" name="p_activo" value="0">
+          <input
+            class="form-check-input"
+            name="p_activo"
+            type="checkbox"
+            id="activeTrue"
+            value="1"
+            {{ old('p_activo') ? 'checked' : '' }}
+          >
+          <label class="form-check-label form-label-AW" for="activeTrue">
+            Producto activo
+          </label>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- Description  -->
+    <div class="row">
+      <div class="pb-3 mobile-color-2">
+        <label for="description" class="form-label-AW">Descripcion</label>
+        <div class="d-flex col-md-12">
+          <input type="text-area"  name="p_description" placeholder="Descripcion..." class="form-control col-md-6" value="{{ old('p_description') }}">
+        </div>
+      </div>
+    </div>
+
+    <!-- Group para demensiones -->
+    <div class="row">
+
+      <div class="col-6 col-md-3 mobile-color pb-2">
+        <label for="p_longitud" class="form-label">Longitud, mm</label>
+        <input type="text" name="p_longitud" placeholder="Longitud..." class="form-control col-md-6" value="{{ old('p_longitud') }}">
+        @if ($errors->has('p_longitud'))
+            <div class="text-danger">
+                {{ $errors->first('p_longitud')}}
+            </div>
+        @endif
+      </div>
+
+      <div class="col-6 col-md-3 mobile-color pb-2">
+        <label for="p_altura" class="form-label">Altura, mm</label>
+        <input type="text" name ="p_altura" placeholder="Altura..." class="form-control col-md-6" value="{{ old('p_altura') }}">
+        @if ($errors->has('p_altura'))
+            <div class="text-danger">
+                {{ $errors->first('p_altura')}}
+            </div>
+        @endif
+      </div>
+
+      <div class="col-6 col-md-3 desctop-color pb-2">
+        <label for="p_ancho" class="form-label">Anchura, mm</label>
+        <input type="text" name="p_ancho" placeholder="Anchura..." class="form-control col-md-6" value="{{ old('p_ancho') }}">
+        @if ($errors->has('p_ancho'))
+            <div class="text-danger">
+                {{ $errors->first('p_ancho')}}
+            </div>
+        @endif
+      </div>
+
+      <div class="col-6 col-md-3 desctop-color pb-2">
+        <label for="p_peso" class="form-label">Peso, gr</label>
+        <input type="text" name="p_peso" placeholder="Peso..." class="form-control col-md-6" value="{{ old('p_peso') }}">
+        @if ($errors->has('p_peso'))
+            <div class="text-danger">
+                {{ $errors->first('p_peso')}}
+            </div>
+        @endif
+      </div>
+    </div>
+
+    <!-- Bloque de precio -->
+
+    <div class="row">
+      <div class="col-6 col-md-3 desctop-color-2 pb-2">
+        <label for="p_precio_compra" class="form-label">Precio de Compra, euro</label>
+        <input type="text" name="p_precio_compra" placeholder="Precio de Compra..." class="form-control col-md-6" value="{{ old('p_precio_compra') }}">
+        @if ($errors->has('p_precio_compra'))
+            <div class="text-danger">
+                {{ $errors->first('p_precio_compra')}}
+            </div>
+        @endif
+      </div>
 
 
 
+      <div class="col-6 col-md-3 desctop-color-2 pb-2">
+        <label for="p_peso" class="form-label">Precio de Venta, euro</label>
+        <input type="text" name="p_precio_venta" placeholder="Precio de Venta..." class="form-control col-md-6" value="{{ old('p_precio_venta') }}">
+        @if ($errors->has('p_precio_venta'))
+            <div class="text-danger">
+                {{ $errors->first('p_precio_venta')}}
+            </div>
+        @endif
+      </div>
+
+      <div class="col-6 col-md-3 mobile-color-2 pb-2" >
+        <label for="p_cantidad_palet" class="form-label">Unidades en palet, ud</label>
+        <input type="text" name="p_cantidad_palet" placeholder="Unidades..." class="form-control col-md-6" value="{{ old('p_cantidad_palet') }}">
+        @if ($errors->has('p_cantidad_palet'))
+            <div class="text-danger">
+                {{ $errors->first('p_cantidad_palet')}}
+            </div>
+        @endif
+      </div>
+
+
+      <div class="col-6 col-md-3 mobile-color-2 pb-2" >
+        <label for="p_peso" class="form-label">Código de barras</label>
+        <input type="text" name="p_codigo" placeholder="Codigo..." class="form-control col-md-6" value="{{ old('p_codigo') }}">
+        @if ($errors->has('p_codigo'))
+            <div class="text-danger">
+                {{ $errors->first('p_codigo')}}
+            </div>
+        @endif
+      </div>
+    </div>
+
+    <!-- Bloque de image -->
+
+    <div class="form-group">
+      <div class="row mobile-color p-2">
+        <div class="col-12 col-sm-6">
+          <label for="name">Image</label>
+          <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)">
+          <br><br>
+          <img id="imagePreview" src="#" alt="Image Preview" style="display:none; max-width: 200px; max-height: 200px;">
+        </div>
+      </div>
+    </div>
+</div>
+</form>
 </body>
+
+@endsection
 
 <style>
 
@@ -145,7 +238,60 @@
 
     .m-20 {
     margin-top: 20px;
+    }
+
+    .btn-AW {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: box-shadow .28s cubic-bezier(.4,0,.2,1);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+  padding: 8px 14px 7px;
 }
+
+.btn-AW:hover{
+  box-shadow: 0 3px 6px rgba(0,0,0,.2),0 3px 6px rgba(0,0,0,.26);
+}
+
+.btn-AW {
+  outline: 0!important
+}
+
+.btn-AW:hover {
+  transition: all .3s
+}
+
+label {
+  font-weight: 600;
+}
+
+.desctop-color, .mobile-color {
+  background-color: #c5d7f2;;
+}
+
+.desctop-color-2, .mobile-color-2 {
+  background-color: #cfe2ff;
+}
+
+@media screen and (max-width:766px) {
+
+  .mobile-color {
+    background-color: #cfe2ff;
+  }
+
+  .mobile-color-2 {
+    background-color: #c5d7f2;
+  }
+
+}
+
 </style>
 
 <script>
@@ -164,3 +310,4 @@
     }
 </script>
 </html>
+

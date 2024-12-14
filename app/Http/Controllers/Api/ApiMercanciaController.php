@@ -136,7 +136,7 @@ class ApiMercanciaController extends Controller
                 if ($lugar) {
                     $mercancia  -> m_lugar = $lugar -> lugar_estanteria . "-" . $lugar -> lugar_planta . "-" . $lugar -> lugar_column;
                 } else {
-                    $mercancia  -> m_lugar = "No hay en Almacen";
+                    $mercancia  -> m_lugar = "No ha en almacén";
                 }
                 $mercancia -> m_nombre_producto = $mercancia->producto->p_nombre ?? 'unknown';
                 $mercancia -> m_precio_venta = $mercancia->producto->p_precio_venta ?? 0;
@@ -211,6 +211,10 @@ class ApiMercanciaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+
+    // Function para aceptar facturas ********************
+
     public function aceptar(Request $request, $id)
     {
         try {
@@ -260,30 +264,34 @@ class ApiMercanciaController extends Controller
                             ]);
 
                             //  Corregir datos de restos en tabla productos
+                            if ($f_aceptado == 1) {  // Solo si factura esta aceptado
+                                $producto = Producto::findOrFail($mercancia['m_id_productos']);
 
-                            $producto = Producto::findOrFail($mercancia['m_id_productos']);
-
-                            if ($tipoFactura == 0) {  // Si factura entrada anadimos campo producto enviado
-                                $producto->decrement('p_cantidad_entrega',$mercancia['m_cantidad_recogida']);
-                                $producto->increment('p_cantidad_almacen',$mercancia['m_cantidad_recogida']);
-                            } else {  // Si factura salida anadimos campo producto reservado y desminuir campo producto en almacen
-                                $producto->decrement('p_cantidad_reservado', $mercancia['m_cantidad_recogida']);
-                                $producto->increment('p_cantidad_enviado',$mercancia['m_cantidad_recogida']);
+                                if ($tipoFactura == 0) {  // Si factura entrada anadimos campo producto enviado
+                                    $producto->decrement('p_cantidad_entrega',$mercancia['m_cantidad_recogida']);
+                                    $producto->increment('p_cantidad_almacen',$mercancia['m_cantidad_recogida']);
+                                } else {  // Si factura salida anadimos campo producto reservado y desminuir campo producto en almacen
+                                    $producto->decrement('p_cantidad_reservado', $mercancia['m_cantidad_recogida']);
+                                    $producto->increment('p_cantidad_enviado',$mercancia['m_cantidad_recogida']);
+                                }
                             }
-
                             // Logica de lugar en almacen     **************************
 
                             if ($f_aceptado == 1) {  // Solo si factura esta aceptado
                                 if ($tipoFactura == 0) {  // Si factura entrada
                                     $resto = $mercancia['m_cantidad_recogida']; // Cuantos unidades necesito colocar
                                     $full = $producto['p_cantidad_palet'];  // Cuantos unidades en palet
-
+                                    $count_lugares = 1; // Contador de lugares necesarios
                                     do {
                                         $lugar = Lugar::where('lugar_producto',$mercancia['m_id_productos']) ->
                                                         where('lugar_cantidad', '<', $full) -> first ();  // buscamos lugar con producto
 
+                                                        log::info ('est lugar0');
+                                                        log::info ($lugar);
+
                                         if (!$lugar) { // si no hay lugares con producto
-                                            $lugar = $this -> buscarLugarNuevo();   // buscamos lugar nuevo
+                                            log::info ('net lugar0');
+                                            $lugar = $this -> buscarLugarNuevo($count_lugares, $mercancia['m_id_productos']);   // buscamos lugar nuevo
                                             $lugar -> lugar_producto = $mercancia['m_id_productos'];
 
                                             if ($full > $resto) {
@@ -300,6 +308,9 @@ class ApiMercanciaController extends Controller
                                         } else {   // si hay celda desponible
                                             $restoEnCelda = $full - $lugar ->lugar_cantidad; // Cantar cuanto colocamos en esta celda
 
+                                            log::info ('est restoEnCelda');
+                                            log::info ($restoEnCelda);
+
                                             if ($restoEnCelda > $mercancia['m_cantidad_recogida']) {
                                                 $lugar ->lugar_cantidad += $mercancia['m_cantidad_recogida'];  // Colocamos producto a celda
                                                 $lugar -> lugar_llenado = ($lugar ->lugar_cantidad/$producto->p_cantidad_palet)*100;  // Cambiar lli¡enado de la celda
@@ -310,10 +321,13 @@ class ApiMercanciaController extends Controller
                                                 $lugar ->lugar_cantidad += $restoEnCelda;  // Colocamos producto a celda
                                                 $lugar -> lugar_llenado = 100; // La Celda es llena
                                                 $resto -= $restoEnCelda;  // Diminuir cantidad de factura
+
+                                                Log::info ('resto despues primer celda');
+                                                Log::info ($resto);
                                             }
                                             $lugar -> save();
                                         }
-
+                                        $count_lugares ++;
                                     } while ($resto > 0);
 
                                 $mercancia['m_lugares'] = Lugar::where ('lugar_producto',$mercancia['m_id_productos']) -> get ();
@@ -352,8 +366,8 @@ class ApiMercanciaController extends Controller
                             }
 
                         } else {
-                            // Обработка ошибки, если данные продукта неполные
-                            return response()->json(['error' => 'Данные продукта неполные'], 400);
+                            // si datos incompletos
+                            return response()->json(['error' => 'Datos de producto son incompletos'], 400);
                         }
                     }
 
@@ -370,12 +384,11 @@ class ApiMercanciaController extends Controller
                 DB::commit();
 
             } catch (\Exception $exception) {
+                DB::rollBack();
                 return $exception -> getMessage();
             }
 
             return $mercancias;
-            DB::rollBack();
-            Log::info ($mercancias);
     }
 
     /**
@@ -390,25 +403,71 @@ class ApiMercanciaController extends Controller
     }
 
     // function para buscar lugar nuevo
-    function buscarLugarNuevo () {
-        $lugar = null;
-        $plantas = [1, 2, 3];
+    function buscarLugarNuevo ($count_lugares, $id_producto) {
+        $lugar = null; // nuevo lugar
 
-            foreach ($plantas as $planta) {
-                $lugar = Lugar::where('lugar_cantidad', 0)
-                            ->where('lugar_planta', $planta)
-                            ->first();
-                if ($lugar) {
-                    break;
+        log::info('buscar lugar nuevo -0');
+        log::info($count_lugares);
+        if ($count_lugares == 1) {   // Si es primero paleta buscamos en primera planta
+
+
+            $lugar = $this -> buscarLugarNuevoPrimero ();  // Buscamos lugar primero
+
+
+        } else {  //Si es no primera paleta
+            $lugar_anterior = Lugar::where('lugar_producto', $id_producto)
+                                    ->orderBy('id', 'desc')
+                                    ->first();              // buscamos lugar anterior
+
+
+            if ($lugar_anterior && $lugar_anterior ->lugar_planta < 3) {   // si no es planta ultima
+                log::info ($lugar_anterior ->lugar_planta);
+                do {
+                    $planta_nueva = $lugar_anterior ->lugar_planta + 1;   // anadimos planta encima de paleta anterior
+                    $lugar_nuevo = Lugar::where('lugar_column', $lugar_anterior->lugar_column)
+                                    ->where('lugar_estanteria', $lugar_anterior->lugar_estanteria)
+                                    ->where('lugar_planta', $planta_nueva)
+                                    ->first();    // obtenemos datos de celda nueva
+
+                    log::info ('producto en lugar nuevo ');
+                    log::info ($lugar_nuevo->lugar_producto);
+                    if ($lugar_nuevo->lugar_producto > 0) {   // comprobamos libre  o no
+                        $planta_nueva ++;
+                        log::info ('pasamos planta!!!!!');
+                        log::info ($lugar_nuevo->lugar_producto);
+                        log::info ($lugar_nuevo->lugar_producto);
+                    } else {
+                        $lugar = $lugar_nuevo;  // si libre - elejimos
+                        break;
+
+                    }
+                }  while ($planta_nueva < 4);  // si no - repetimos
+
+                if (!$lugar) {  // si no elejimos hasta ahora
+                    $lugar = $this -> buscarLugarNuevoPrimero (); // Buscamos lugar como nuevo
                 }
-            }
-
-            if ($lugar) {
-
-                return $lugar;
             } else {
-                return null;
+                $lugar = $this -> buscarLugarNuevoPrimero (); // Buscamos lugar como nuevo
             }
+        }
+            return $lugar;
+        }
+
+        // buscamos lugar para primera paleta
+        private function buscarLugarNuevoPrimero () {
+            $lugar = null;
+            $plantas = [1, 2, 3];
+
+                foreach ($plantas as $planta) {
+                    $lugar = Lugar::where('lugar_cantidad', 0)
+                                ->where('lugar_planta', $planta)
+                                ->first();
+                    if ($lugar) {
+                        break;
+                    }
+                }
+            return $lugar;
+
         }
 
         // function para obtener tipo factura 0 = compra 1 = venta
@@ -452,7 +511,7 @@ class ApiMercanciaController extends Controller
         }
     }
 
-
+    // function para update mercancias
     private function updateMercancias ($mercancias, $mercanciasViejo, $id, $tipoFactura) {
             foreach ($mercancias as $mercancia) {
                 if (isset($mercancia['m_id_productos']) && isset($mercancia['m_cantidad_pedida'])) {

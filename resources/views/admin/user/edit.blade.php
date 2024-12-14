@@ -1,7 +1,7 @@
 @extends('plantilla.plantilla')
 @section('contenido')
 
-        <div class="info-container AW-center">
+        <div class="info-container">
             <div class="d-flex justify-content-between">
                 <h1> Editar usuario</h1>
                 <a  href="{{ route('users.index')}}">
@@ -11,12 +11,12 @@
 
             <div class="form">
                 <div class="container mt-2">
-                    <div class="table_container">
+                    <div class="table_container-edit">
 
                         <form class="w-85" action="{{ route('users.update', $usuario->usuario_id) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
-                            <div class="row m-20">
+                            <div class="row m-10">
                                 <div class="form-group col-12 col-md-7">
                                     <label for="u_nombre">Nombre usuario</label>
                                     <input type="text" class="form-control" id="u_nombre" name="u_nombre" value="{{ $usuario->u_nombre }}">
@@ -30,7 +30,7 @@
                                 </div>
                             </div>
 
-                            <div class="row m-20">
+                            <div class="row m-10">
                                 <div class="form-group col-12 col-md-7">
                                     <label for="u_login">Login</label>
                                     <input type="text" class="form-control" id="u_login" name="u_login" value="{{ $usuario->u_login }}">
@@ -44,7 +44,7 @@
                                 </div>
                             </div>
 
-                            <div class="row m-20">
+                            <div class="row m-10">
                                 <div class="form-group col-12 col-md-7">
                                     <label for="u_password">Password</label>
                                     <input type="password" class="form-control" id="u_password" name="u_password">
@@ -58,7 +58,7 @@
                                 </div>
                             </div>
 
-                            <div class="row m-20">
+                            <div class="row m-10">
                                 <div class="form-group col-12 col-md-7">
                                     <label for="u_password2">Repite password</label>
                                     <input type="password" class="form-control" id="u_password2" name="u_password2">
@@ -73,9 +73,9 @@
                             </div>
 
 
-                            <div class="row m-20">
+                            <div class="row m-10">
                                 <div class="form-group col-12 col-md-7">
-                                    <label for="u_role">Role</label>
+                                    <label for="u_role">Rol</label>
                                     <select class="w-100" name="u_role" id="u_role" class="form-control" required>
                                         <option value="recogedor" {{ $usuario->u_role == 'recogedor' ? 'selected' : '' }}>Recogedor</option>
                                         <option value="admin" {{ $usuario->u_role == 'admin' ? 'selected' : '' }}>Admin</option>
@@ -95,18 +95,18 @@
                             </div>
 
 
-                            <div class="row m-20">
+                            <div class="row m-10">
                                 <div class="form-check col-12 col-md-3">
                                     <input class="form-check-input" name ="u_active" type="radio" value=1 id="activeTrue" {{ $usuario->u_active == 1 ? 'checked' : '' }}>
                                     <label class="form-check-label form-label-AW" for="activeTrue">
-                                    Usuario active
+                                    Usuario activo
                                     </label>
                                 </div>
 
                                 <div class="form-check col-12 col-md-4">
                                     <input class="form-check-input" type="radio" name ="u_active" value=0 id="activeFalse" {{ $usuario->u_active == 0 ? 'checked' : '' }}>
                                     <label class="form-check-label form-label-AW" for="activeFalse">
-                                        Usuario inactive
+                                        Usuario inactivo
                                     </label>
                                 </div>
                                 <div class="form-group col-12 col-md-4">
@@ -118,58 +118,11 @@
                                 </div>
                             </div>
 
-                            <button class='m-20 btn btn-primary'>Editar usuario </button>
+                            <button class='m-10 btn btn-primary'>Editar usuario </button>
                          </form>
                     </div>
                 </div>
             </div>
         </div>
 
-<style>
-
-    .AW-body {
-        display:flex;
-    }
-
-    .main-content {
-        text-align: center;
-        width:100%;
-    }
-
-    .btn-new {
-    border-radius: 10px;
-    color: white;
-    transition: .2s linear;
-    background: #0B63F6;
-    }
-
-    .btn-new:hover {
-        box-shadow: 0 0 0 2px white, 0 0 0 4px #3C82F8;
-    }
-
-    .table_container {
-        display: flex;
-        justify-content: center;
-        align-items: baseline;
-        padding: 10px;
-        background-color: #ccc;
-    }
-
-    .m-20 {
-    margin-top: 10px;
-    }
-    label {
-        font-weight:600;
-    }
-
-
-    .w-85 {
-        width:85%;
-    }
-
-    .p-mobile {
-        padding-top: 27px;
-        padding-left: 10px;
-    }
-</style>
 @endsection

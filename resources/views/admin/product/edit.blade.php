@@ -50,10 +50,10 @@
 
       <!-- Categoria select -->
       <div class="col-12 col-sm-6 col-md-4 desctop-color pb-2">
-        <label for="p_categoria" class="form-label-AW">Categoria</label>
+        <label for="p_categoria" class="form-label-AW">Categoría</label>
         <div>
           <select name="p_categoria" class="form-control col-md-6">
-            <option value="">-- Elije una categoria --</option>
+            <option value="">-- Elije una categoría --</option>
             <option  value="1" {{ $producto->p_categoria == 1 ? 'selected' : '' }}>Bebidas</option>
             <option  value="2" {{ $producto->p_categoria == 2 ? 'selected' : '' }}>Cereales</option>
             <option  value="3" {{ $producto->p_categoria == 3 ? 'selected' : '' }}>Enlatada</option>
@@ -174,7 +174,7 @@
       </div>
 
       <div class="col-6 col-md-3 mobile-color-2 pb-2" >
-        <label for="p_cantidad_palet" class="form-label">Unidades en palet, ud</label>
+        <label for="p_cantidad_palet" class="form-label">Unidades en palé, ud</label>
         <input type="text" name="p_cantidad_palet" placeholder="Unidades..." class="form-control col-md-6" value="{{ $producto->p_cantidad_palet }}">
         @if ($errors->has('p_cantidad_palet'))
             <div class="text-danger">
@@ -200,7 +200,7 @@
     <div class="form-group">
       <div class="row mobile-color p-2">
         <div class="col-12 col-sm-6">
-          <label for="name">Image</label>
+          <label for="name">Imagen</label>
           <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)">
           <br><br>
           <img id="imagePreview" src="#" alt="Image Preview" style="display:none; max-width: 200px; max-height: 200px;">
@@ -212,92 +212,6 @@
 </body>
 
 @endsection
-
-<style>
-
-    .AW-body {
-        display:flex;
-    }
-
-    .main-content {
-        text-align: center;
-        width:100%;
-    }
-
-    .btn-new {
-    border-radius: 10px;
-    color: white;
-    transition: .2s linear;
-    background: #0B63F6;
-    }
-
-    .btn-new:hover {
-        box-shadow: 0 0 0 2px white, 0 0 0 4px #3C82F8;
-    }
-
-    .table_container {
-        display: flex;
-        justify-content: center;
-        align-items: baseline;
-    }
-
-    .m-20 {
-    margin-top: 20px;
-    }
-
-    .btn-AW {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  transition: box-shadow .28s cubic-bezier(.4,0,.2,1);
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
-  overflow: hidden;
-  position: relative;
-  user-select: none;
-  padding: 8px 14px 7px;
-}
-
-.btn-AW:hover{
-  box-shadow: 0 3px 6px rgba(0,0,0,.2),0 3px 6px rgba(0,0,0,.26);
-}
-
-.btn-AW {
-  outline: 0!important
-}
-
-.btn-AW:hover {
-  transition: all .3s
-}
-
-label {
-  font-weight: 600;
-}
-
-.desctop-color, .mobile-color {
-  background-color: #c5d7f2;
-}
-
-.desctop-color-2, .mobile-color-2 {
-  background-color: #cfe2ff;
-}
-
-@media screen and (max-width:766px) {
-
-  .mobile-color {
-    background-color: #cfe2ff;
-  }
-
-  .mobile-color-2 {
-    background-color: #c5d7f2;
-  }
-
-}
-
-</style>
 
 <script>
     function previewImage(event) {

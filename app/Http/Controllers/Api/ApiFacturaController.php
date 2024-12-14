@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\Factura;
+use App\Models\Mercancia;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ApiFacturaController extends Controller
 {
@@ -16,7 +19,7 @@ class ApiFacturaController extends Controller
      */
     public function index()
     {
-        $facturas = Factura::all();
+        $facturas = Factura::orderBy('factura_id', 'desc') -> get();
         // Log::info('Authorization header: ' . $request->header('Authorization'));
 
 
@@ -92,6 +95,31 @@ class ApiFacturaController extends Controller
      */
     public function destroy($factura_id)
     {
-        Factura::findOrFail($factura_id)->delete();
+        try {
+
+            DB::beginTransaction();  // Empesar transaction
+            $facturaParaBorrar = Factura::findOrFail($factura_id);
+            $mercancias = Mercancia::where('m_id_facturas', $factura_id) -> get();
+            foreach ($mercancias as &$mercancia) {   // Volveremos cantidades de todos productos al estado inicial
+                $producto = Producto::find($mercancia -> m_id_productos);
+                if ($producto) {
+                    if ($facturaParaBorrar -> f_tipo == 0) { // Si factura compra
+                        $producto -> p_cantidad_entrega -= $mercancia -> m_cantidad_pedida;
+                    } else {
+                        $producto ->p_cantidad_reservado -= $mercancia -> m_cantidad_pedida;
+                        $producto ->p_cantidad_almacen += $mercancia -> m_cantidad_pedida;
+                    }
+                    $producto -> save();
+                }
+                $mercancia-> delete();
+            }
+
+            $facturaParaBorrar->delete();
+            DB::commit();
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $exception -> getMessage();
+        }
     }
 }

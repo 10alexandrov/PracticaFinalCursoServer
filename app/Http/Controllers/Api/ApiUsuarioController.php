@@ -61,13 +61,6 @@ class ApiUsuarioController extends Controller
             'userId' => $request->u_nombre),
             200
         );
-     /*   $data = $request->except('_token');
-        Usuario::create($data);
-
-        return "Datos cargados correctamente";
-
-         $usuarios=Usuario::get();
-         return $usuarios = Usuario::all();*/
     }
 
     /**

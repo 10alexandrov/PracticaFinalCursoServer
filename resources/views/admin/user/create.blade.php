@@ -2,7 +2,7 @@
 @section('contenido')
 
 
-        <div class="info-container AW-center">
+        <div class="info-container">
             <div class="d-flex justify-content-between">
                 <h1> Crear nuevo usuario</h1>
                 <a  href="{{ route('users.index')}}">
@@ -11,7 +11,7 @@
             </div>
             <div class="form">
                 <div class="container mt-2">
-                    <div class="table_container">
+                    <div class="table_container-edit">
 
                         <form class="w-85" action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
@@ -78,9 +78,9 @@
 
                             <div class="row m-20">
                                 <div class="form-group col-12 col-md-7">
-                                   <label for="u_role">Role</label>
+                                   <label for="u_role">Rol</label>
                                    <select name="u_role" class="w-100">
-                                       <option value=""> == Elije un role == </option>
+                                       <option value=""> == Elije un rol == </option>
                                        <option  value="recogedor">Recogedor</option>
                                        <option  value="admin">Admin</option>
                                         <option  value="manager">Manager</option>
@@ -103,14 +103,14 @@
                                 <div class="form-check col-12 col-md-3">
                                     <input class="form-check-input" name ="u_active" type="radio" value=1 id="activeTrue">
                                     <label class="form-check-label form-label-AW" for="activeTrue">
-                                    Usuario active
+                                    Usuario activo
                                     </label>
                                 </div>
 
                                 <div class="form-check col-12 col-md-4">
                                     <input class="form-check-input" type="radio" name ="u_active" value=0 id="activeFalse">
                                     <label class="form-check-label form-label-AW" for="activeFalse">
-                                        Usuario inactive
+                                        Usuario inactivo
                                     </label>
                                 </div>
                                 <div class="form-group col-12 col-md-4">
@@ -132,52 +132,4 @@
             </div>
         </div>
 
-
-<style>
-
-    .AW-body {
-        display:flex;
-    }
-
-    .main-content {
-        text-align: center;
-        width:100%;
-    }
-
-    .btn-new {
-    border-radius: 10px;
-    color: white;
-    transition: .2s linear;
-    background: #0B63F6;
-    }
-
-    .btn-new:hover {
-        box-shadow: 0 0 0 2px white, 0 0 0 4px #3C82F8;
-    }
-
-    .table_container {
-        display: flex;
-        justify-content: center;
-        align-items: baseline;
-        padding: 10px;
-        background-color: #ccc;
-    }
-
-    .m-20 {
-    margin-top: 10px;
-    }
-    label {
-        font-weight:600;
-    }
-
-    .w-85 {
-        width:85%;
-    }
-
-    .p-mobile {
-        padding-top: 27px;
-        padding-left: 10px;
-    }
-
-</style>
 @endsection

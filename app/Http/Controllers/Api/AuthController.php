@@ -5,37 +5,43 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Model\Usuarios;
+use App\Models\Usuario;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-        // Method pata login
+    public function login(Request $request)
+{
+    $credentials = $request->only('u_login', 'u_password');
+    $credentials['password'] = $credentials['u_password'];
+    unset($credentials['u_password']);
 
-        public function login(Request $request)
-        {
-            $credentials = $request->only('u_login', 'u_password');
-            $credentials['password'] = $credentials['u_password'];
-            unset($credentials['u_password']);
+    // Попытка найти пользователя по логину
+    $usuario = Usuario::where('u_login', $credentials['u_login'])->first();
 
-            \Log::info('Attempting login with credentials:', $credentials);
+    // Проверяем, существует ли пользователь и активен ли он
+    if (!$usuario || $usuario->u_active != 1) {
+        return response()->json(['error' => 'Usuario no está activo o no existe'], 403);
+    }
 
-            if (!$token = JWTAuth::attempt($credentials)) {
-                \Log::error('Login failed for credentials:', $credentials);
-                return response()->json(['error' => 'Datos son incorrectos'], 401);
-            }
+    // Аутентификация через JWT
+    if (!$token = JWTAuth::attempt($credentials)) {
+        return response()->json(['error' => 'Datos son incorrectos'], 401);
+    }
 
-            $usuario = auth() -> user();    // Obtener usuario autorizado
-            $role = $usuario -> u_role;  // Obtener role de usuario
-            $usuario_id = $usuario -> usuario_id;
-            $tokenTTL = auth('api')->factory()->getTTL()*60;
+    // Получение информации о пользователе
+    $role = $usuario->u_role;  // Роль пользователя
+    $usuario_id = $usuario->usuario_id;
+    $tokenTTL = JWTAuth::factory()->getTTL() * 60;
 
-            return response () -> json ([
-                'token' => $token,
-                'usuario' => $usuario_id,
-                'role' => $role,
-                'expires_in' => $tokenTTL]);
-        }
+    // Возврат токена и данных пользователя
+    return response()->json([
+        'token' => $token,
+        'usuario' => $usuario_id,
+        'role' => $role,
+        'expires_in' => $tokenTTL
+    ]);
+}
 
 
         // Method para logout

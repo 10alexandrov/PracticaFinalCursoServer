@@ -7,27 +7,27 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Show producto</title>
+        <title>Mostrar producto</title>
 
     </head>
 
 
 <body>
-    <div class="info-container AW-center">
+    <div class="info-container">
         <div class="row justify-content-between">
             <h1 class = "col-12 col-md-7 pt-1"> {{ $producto->p_nombre}}</h1>
             <div class="col-12 col-md-5 d-flex justify-content-between pt-2">
                 <div class="m-10">
                     <a  href="{{ route('product.edit', $producto->product_id)}}">
-                        <button class='m-100 btn btn-warning'>Editar </button>
+                        <button class='btn btn-warning'>Editar </button>
                     </a>
                 </div>
                 <div class="m-10">
-                        <button class='m-100 btn btn-danger' id="desactivar">Desactivar</button>
+                        <button class='btn btn-danger' id="desactivar">Desactivar</button>
                 </div>
                 <div class="m-10">
                     <a  href="{{ route('product.index')}}">
-                        <button class='m-100 btn btn-primary'>Volver </button>
+                        <button class='btn btn-primary'>Volver </button>
                     </a>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                   <tr>
                     <th>Precio de compra</th>
                     <th>Precio de venta</th>
-                    <th>Activo</th>
+                    <th>Estado</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -77,14 +77,14 @@
               </table>
 
           </div>
-          <div class="col-4 desktop-version">
-            <div class="image">
-                <img src="{{ $producto->p_foto}}">
+          <div class="col-4 desktop-version-show">
+            <div>
+                <img class="img-AW" src="{{ $producto->p_foto}}">
             </div>
           </div>
         </div>
-        <h5>Demenciones</h5>
-            <div class="desktop-version">
+        <h5>Dimenciones</h5>
+            <div class="desktop-version-show">
               <table class="table table-striped table-bordered">
                 <thead class="table-primary">
                   <tr>
@@ -111,7 +111,7 @@
 
 
               <!-- Mobile versin-->
-            <div class="mobile-version">
+            <div class="mobile-version-show">
               <table class="table table-striped table-bordered">
                 <thead class="table-primary">
                   <tr>
@@ -154,7 +154,7 @@
 
     <!--Popup ventana-->
     <div class="d-none popup2" id='popup'>
-      <p>Desea desactivar producto: {{$producto->p_nombre}}</p>
+      <p>¿Desea desactivar producto: {{$producto->p_nombre}}?</p>
       <div class="d-flex buttons justify-content-around">
         <form action="{{ route('product.destroy', $producto->product_id)}}" method="POST">
             @method('DELETE')
@@ -165,187 +165,6 @@
       </div>
     </div>
 
-<style>
-    .wrapper-image {
-  width: 200px;
-  height: 300px;
-  overflow: hidden;
-}
-
-.img-AW {
-  width:100%;
-  height: 100%;
-  object-fit: contain;
-
-}
-
-.mobile-version {
-  display: none;
-}
-
-@media screen and (max-width:576px) {
-
-  .mobile-version {
-    display: block;
-  }
-
-  .desktop-version {
-    display: none;
-  }
-}
-
-//   Popup ventanas
-
-.popup {
-  position: absolute;
-  top: 10%;
-  left: 35%;
-  padding: 10px;
-  width: 30%;
-  height: 65%;
-  background-color: white;
-  border: 1px solid black;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
-}
-
-
-.popup2 {
-  position: absolute;
-  top: 25%;
-  left: 35%;
-  padding: 10px;
-  width: 30%;
-  height: 30%;
-  background-color: white;
-  border: 1px solid black;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
-}
-
-.popup2 p {
-  font-size: 1.5rem;
-  text-align: center;
-  margin-bottom: 2px;
-}
-
-.buttons {
-  position: absolute;
-  bottom: 5px;
-  width: 93%;
-}
-
-.mobileVisible {
-  display: none;
-}
-
-.mobileInvisible {
-  display: block;
-}
-
-.mobileInvisibleTable {
-  display: table-cell;
-}
-
-@media screen and (max-width:1050px) {
-  .popup2 {
-    top: 25%;
-    left: 35%;
-    width: 40%;
-    height: 30%;
-  }
-
-  .popup2 p {
-    font-size: 1.5rem;
-    margin-bottom: 2px;
-  }
-
-  .popup {
-    top: 20%;
-    left: 30%;
-    padding: 10px;
-    width: 40%;
-    height: 65%;
-  }
-}
-
-@media screen and (max-width:850px) {
-  .popup2 {
-    top: 25%;
-    left: 35%;
-    padding: 10px;
-    width: 50%;
-    height: 30%;
-  }
-
-  .popup2 p {
-    font-size: 1.5rem;
-  }
-}
-
-@media screen and (max-width:767px) {
-
-  .popup2 {
-    left: 20%;
-    padding: 10px;
-    width: 60%;
-    height: 35%;
-  }
-
-  .popup2 p {
-    font-size: 1.4rem;
-  }
-
-  .popup {
-    top: 20%;
-    left: 20%;
-    width: 60%;
-  }
-}
-
-@media screen and (max-width:576px) {
-
-  .popup2 {
-    left: 10%;
-    padding: 10px;
-    width: 80%;
-    height: 40%;
-  }
-
-  .popup2 p {
-    font-size: 1.3rem;
-  }
-
-  .popup {
-    top: 20%;
-    left: 10%;
-    width: 80%;
-    height: 65%;
-  }
-
-  .img-AW {
-    max-width: 150px;
-  }
-
-  .mobileVisible {
-    display: block;
-  }
-
-  .mobileInvisible, .mobileInvisibleTable {
-    display: none;
-  }
-}
-
-@media screen and (max-width:767px) {
-  table {
-    font-size: 2.5vw;
-  }
-}
-
-@media screen and (max-width:576px) {
-  table {
-    font-size: 3vw;
-  }
-}
-</style>
 
 <script>
 

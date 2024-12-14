@@ -23,7 +23,7 @@
                 @csrf
                 <div class="row pb-2">
                     <div class="form-group col-12 col-sm-10 col-md-5 align-self-center mt-1 row mb-1">
-                       <label for="find_categoria" class="col-4 col-md-5" >Categoria</label>
+                       <label for="find_categoria" class="col-4 col-md-5" >Categoría</label>
                         <select class="col-8 col-md-7" name="find_categoria">
                             <option value="">Elije categoria</option>
                             <option  value="1">Bebidas</option>
@@ -50,8 +50,8 @@
                 <table class="table table-bordered table-primary">
                     <tr>
                         <th> Producto </th>
-                        <th class="tablet-hidden"> Categoria </th>
-                        <th class="mobile-hidden"> Actividad </th>
+                        <th class="tablet-hidden"> Categoría </th>
+                        <th class="mobile-hidden"> Estado </th>
                         <th> Mostrar </th>
                         <th> Editar </th>
                         <th> Borrar </th>
@@ -91,58 +91,3 @@
 </html>
 
 @endsection
-
-<style>
-
-    .AW-body {
-        display:flex;
-    }
-
-    .main-content {
-        text-align: center;
-        width:100%;
-    }
-
-    .find-container {
-        background-color: #bbb;
-    }
-
-    .table_container {
-        display: flex;
-        justify-content: center;
-        align-items: baseline;
-    }
-
-    th, td {
-        width: 150px;
-        text-align: left;
-    }
-
-    td {
-        font-weight: 400;
-    }
-
-    td a{
-        font-weight: 800;
-        text-decoration: none;
-    }
-
-    .btn-new {
-    border-radius: 10px;
-    color: white;
-    transition: .2s linear;
-    background: #0B63F6;
-    }
-
-    .btn-new:hover {
-        box-shadow: 0 0 0 2px white, 0 0 0 4px #3C82F8;
-    }
-
-    .m-100 {
-        margin-top: 100px;
-    }
-
-    .d-flex {
-        display: flex;
-    }
-</style>
